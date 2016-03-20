@@ -17,10 +17,15 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/new_button"
+            android:id="@+id/ok_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/new_button" />
+            android:text="@string/ok_button" />
+        <Button
+            android:id="@+id/edit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_button" />
 
         <Button
             android:id="@+id/delete_button"
