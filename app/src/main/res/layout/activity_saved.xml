@@ -3,12 +3,14 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:gravity="center"
-              android:orientation="vertical" >
+              android:orientation="vertical"
+    android:weightSum="1">
 
     <ListView
         android:layout_width = "match_parent"
         android:layout_height = "300dp"
-        android:entries="@array/triggerList">
+        android:entries="@array/triggerList"
+        android:layout_weight="0.86">
     </ListView>
 
     <LinearLayout
@@ -20,17 +22,20 @@
             android:id="@+id/ok_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ok_button" />
+            android:text="@string/ok_button"
+            android:layout_alignParentBottom="true" />
         <Button
             android:id="@+id/edit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/edit_button" />
+            android:text="@string/edit_button"
+            android:layout_alignParentBottom="true" />
 
         <Button
             android:id="@+id/delete_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/delete_button" />
+            android:text="@string/delete_button"
+            android:layout_alignParentBottom="true" />
     </LinearLayout>
 </LinearLayout>

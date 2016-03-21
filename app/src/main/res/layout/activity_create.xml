@@ -12,6 +12,7 @@
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:id="@+id/trigger_spinner"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -19,6 +20,7 @@
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:id="@+id/action_spinner"
         android:entries="@array/actionArray"
         android:layout_below="@+id/trigger_spinner"
@@ -27,6 +29,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:id="@+id/contact_name"
         android:layout_below="@+id/action_spinner"
         android:layout_alignParentLeft="true"
@@ -36,6 +39,7 @@
         android:inputType="textMultiLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:id="@+id/message_text"
         android:hint="Message"
         android:layout_below="@+id/contact_name"
@@ -44,6 +48,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:id="@+id/action_name"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

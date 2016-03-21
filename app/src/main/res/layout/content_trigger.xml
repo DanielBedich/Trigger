@@ -3,12 +3,14 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:gravity="center"
-              android:orientation="vertical" >
+              android:orientation="vertical"
+    android:weightSum="1">
 
     <ListView
         android:layout_width = "match_parent"
         android:layout_height = "300dp"
-        android:entries="@array/triggerList">
+        android:entries="@array/triggerList"
+        android:layout_weight="0.86">
     </ListView>
 
     <LinearLayout
