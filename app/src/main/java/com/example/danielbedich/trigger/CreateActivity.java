@@ -1,9 +1,15 @@
 package com.example.danielbedich.trigger;
 
+import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
@@ -24,14 +30,15 @@ public class CreateActivity extends AppCompatActivity {
     private EditText mMessageText;
     private String contactID;
     private Uri uriContact;
+    private NotificationManager mNotificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mMessageText = (EditText) findViewById(R.id.message_text);
-
         mButtonSave = (Button) findViewById(R.id.save_button);
         mButtonSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,17 +55,33 @@ public class CreateActivity extends AppCompatActivity {
                 Intent cancelAction = new Intent(v.getContext(), TriggerActivity.class);
                 startActivity(cancelAction);
 
+
+                NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(v.getContext());
+                notifBuilder.setSmallIcon(R.drawable.common_google_signin_btn_icon_dark);
+                notifBuilder.setContentTitle("Trigger");
+                notifBuilder.setTicker("New Trigger!");
+                notifBuilder.setContentText(mMessageText.getText().toString());
+
+                long[] vibrateTime = {2000};
+                notifBuilder.setVibrate(vibrateTime);
+                Intent resultIntent = new Intent(CreateActivity.this, TriggerActivity.class);
+                PendingIntent resultPendingIntent = PendingIntent.getActivity(CreateActivity.this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                notifBuilder.setContentIntent(resultPendingIntent);
+                mNotificationManager.notify(1, notifBuilder.build());
+/**
                 //Call the specified number
                 Intent call = new Intent(Intent.ACTION_CALL);
                 call.setData(Uri.parse("tel:" + mContactText.getText().toString()));
-                startActivity(call);
-/**
+                if(PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.CALL_PHONE)) {
+                    startActivity(call);
+                }
+
                 //How to text someone
                 SmsManager smsMan = SmsManager.getDefault();
                 String num = mContactText.getText().toString();
                 String mes= mMessageText.getText().toString();
                 smsMan.sendTextMessage(num,null,mes,null, null);
-*/
+ */
             }
         });
 
