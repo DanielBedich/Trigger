@@ -48,11 +48,17 @@ public class CreateActivity extends AppCompatActivity {
                 Intent cancelAction = new Intent(v.getContext(), TriggerActivity.class);
                 startActivity(cancelAction);
 
+                //Call the specified number
+                Intent call = new Intent(Intent.ACTION_CALL);
+                call.setData(Uri.parse("tel:" + mContactText.getText().toString()));
+                startActivity(call);
+/**
                 //How to text someone
                 SmsManager smsMan = SmsManager.getDefault();
                 String num = mContactText.getText().toString();
                 String mes= mMessageText.getText().toString();
                 smsMan.sendTextMessage(num,null,mes,null, null);
+*/
             }
         });
 
