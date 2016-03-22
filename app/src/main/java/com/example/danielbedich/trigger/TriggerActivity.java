@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
+
+import java.util.ArrayList;
 
 public class TriggerActivity extends AppCompatActivity {
 
@@ -19,8 +22,18 @@ public class TriggerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trigger);
+        //how to dynamically add items to the list
+        //need to learn how to save activity details for when the app closes and then use those activity names to refill list
+        ArrayList<String> triggers = new ArrayList<>();
+        triggers.add("ayyyy");
+        triggers.add("beeee");
+        ListView listView = (ListView)findViewById(R.id.triggerlist);
+        StringArrayAdapter listAdapter = new StringArrayAdapter(triggers, this);
+        listView.setAdapter(listAdapter);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
 
         mButtonNew = (Button) findViewById(R.id.new_button);
         mButtonNew.setOnClickListener(new View.OnClickListener(){
