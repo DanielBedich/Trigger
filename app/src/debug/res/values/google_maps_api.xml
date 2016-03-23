@@ -18,4 +18,8 @@
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
          AIzaSyBMC76u2o-kgcnq_Moift1BPxUSR-u1IEM
     </string>
+    <string name="google_maps_distance_matrix_key" templateMergeStrategy="preserve" translatable="false">
+         AIzaSyDsK5yz4-vcjofFFv2oe8YlAsWEdG80opA
+    </string>
+
 </resources>

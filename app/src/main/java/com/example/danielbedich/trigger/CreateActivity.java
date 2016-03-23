@@ -1,12 +1,16 @@
 package com.example.danielbedich.trigger;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.v4.app.NotificationCompat;
@@ -15,6 +19,8 @@ import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -26,10 +32,22 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.app.TimePickerDialog;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.List;
+
 public class CreateActivity extends AppCompatActivity {
 
+
+    private static final String TAG = "CreateActivity";
+    private static final String TRIGGER_INDEX = "Time";
+    private static final String ACTION_INDEX = "Reminder";
+    private static final String CONTACT_INDEX = null;
+    private static final String MESSAGE_INDEX = null;
+    private static final String NAME_INDEX = null;
+    private static final String LOCATION_INDEX = null;
     private static final int CONTACT_PICKER = 1;
-    private static final int LOCATION_PICKER = 1;
+    private static final int LOCATION_PICKER = 2;
     private static final String DEBUG_TAG = null;
     private Button mButtonSave;
     private Button mButtonCancel;
@@ -44,21 +62,18 @@ public class CreateActivity extends AppCompatActivity {
     private EditText mGPSLocationText;
     private String[] triggerArray;
     private String[] actionArray;
-
+    private EditText mNameText;
+    String location;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
-        mGPSLocationText = (EditText) findViewById(R.id.gps_location);
-        mGPSLocationText.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                Intent gpsAction = new Intent(v.getContext(), MapsActivity.class);
-                startActivity(gpsAction);
-            }
-        });
+        mNameText = (EditText) findViewById(R.id.action_name);
 
+        mGPSLocationText = (EditText) findViewById(R.id.gps_location);
+
+        mGPSLocationText.setText(getIntent().getStringExtra("mytext"));
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mMessageText = (EditText) findViewById(R.id.message_text);
         mSpinnerAction = (Spinner) findViewById(R.id.action_spinner);
@@ -150,10 +165,41 @@ public class CreateActivity extends AppCompatActivity {
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent cancelAction = new Intent(v.getContext(), TriggerActivity.class);
-                startActivity(cancelAction);
+                //Intent cancelAction = new Intent(v.getContext(), TriggerActivity.class);
+                //startActivity(cancelAction);
 
 
+                Geocoder geocoder = new Geocoder(getApplicationContext());
+                List<Address> addresses = null;
+                try{
+                    addresses = geocoder.getFromLocationName(mGPSLocationText.getText().toString(),1);
+                } catch (IOException e){
+
+                }
+                if(addresses.size()>0){
+                    double latitude = addresses.get(0).getLatitude();
+                    double longitude = addresses.get(0).getLongitude();
+                    mMessageText.setText(latitude+"");
+                    mContactText.setText(longitude+"");
+                }
+
+                //create an AlarmManager for scenario of picking time
+                Intent timeIntent = new Intent(CreateActivity.this, TriggerExecution.class);
+                PendingIntent pendTimeIntent = PendingIntent.getService(CreateActivity.this, 1, timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                AlarmManager alarmMan = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(System.currentTimeMillis());
+                cal.add(Calendar.SECOND, 10);
+                /**
+                 cal.add(Calendar.HOUR_OF_DAY, mTimePicker.getCurrentHour());
+                 cal.add(Calendar.MINUTE, mTimePicker.getCurrentMinute());
+                 cal.add(Calendar.SECOND, 0);
+                 cal.add(Calendar.MILLISECOND, 0);
+                 */
+                alarmMan.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendTimeIntent);
+
+                /*
                 NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(v.getContext());
                 notifBuilder.setSmallIcon(R.drawable.common_google_signin_btn_icon_dark);
                 notifBuilder.setContentTitle("Trigger");
@@ -166,7 +212,7 @@ public class CreateActivity extends AppCompatActivity {
                 PendingIntent resultPendingIntent = PendingIntent.getActivity(CreateActivity.this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 notifBuilder.setContentIntent(resultPendingIntent);
                 mNotificationManager.notify(1, notifBuilder.build());
-/**
+
                 //Call the specified number
                 Intent call = new Intent(Intent.ACTION_CALL);
                 call.setData(Uri.parse("tel:" + mContactText.getText().toString()));
@@ -178,8 +224,7 @@ public class CreateActivity extends AppCompatActivity {
                 SmsManager smsMan = SmsManager.getDefault();
                 String num = mContactText.getText().toString();
                 String mes= mMessageText.getText().toString();
-                smsMan.sendTextMessage(num,null,mes,null, null);
- */
+                smsMan.sendTextMessage(num,null,mes,null, null); */
             }
         });
 
@@ -247,7 +292,70 @@ public class CreateActivity extends AppCompatActivity {
             contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
         }
         cursor.close();
+    }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        super.onSaveInstanceState(savedInstanceState);
+        Log.i(TAG, "onSaveInstanceState");
+        savedInstanceState.putString(TRIGGER_INDEX, mSpinnerTrigger.toString());
+        savedInstanceState.putString(ACTION_INDEX, mSpinnerAction.toString());
+        savedInstanceState.putString(NAME_INDEX, mNameText.toString());
+        savedInstanceState.putString(MESSAGE_INDEX, mMessageText.toString());
+        savedInstanceState.putString(CONTACT_INDEX, mContactText.toString());
+        savedInstanceState.putString(LOCATION_INDEX, mGPSLocationText.toString());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart() called");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause() called");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume() called");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop() called");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy() called");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 
