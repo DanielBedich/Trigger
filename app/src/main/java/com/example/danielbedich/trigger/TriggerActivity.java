@@ -34,14 +34,14 @@ public class TriggerActivity extends AppCompatActivity {
         //how to dynamically add items to the list
         //need to learn how to save activity details for when the app closes and then use those activity names to refill list
         triggers = getSharedPreferencesLogList(TriggerActivity.this);
-        triggers.add(this.getIntent().getStringExtra("actionName"));
+        if(this.getIntent().getStringExtra("actionName") !=null) {
+            triggers.add(this.getIntent().getStringExtra("actionName"));
+        }
         saveSharedPreferencesLogList(TriggerActivity.this, triggers);
         Log.d("actionName", "onClick: " + triggers.toString());
-        if(!triggers.isEmpty()) {
             ListView listView = (ListView) findViewById(R.id.triggerlist);
             StringArrayAdapter listAdapter = new StringArrayAdapter(triggers, this);
             listView.setAdapter(listAdapter);
-        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
