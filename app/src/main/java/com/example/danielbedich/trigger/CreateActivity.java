@@ -7,11 +7,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +38,12 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
 public class CreateActivity extends AppCompatActivity {
 
 
@@ -59,7 +67,15 @@ public class CreateActivity extends AppCompatActivity {
     private Spinner mSpinnerTrigger;
     private Spinner mSpinnerAction;
     private TimePicker mTimePicker;
+    private EditText contactNumber;
+    private EditText message;
+    private EditText actionName;
+    private Spinner triggerSpinner;
+    private Spinner actionSpinner;
+    private TimePicker timePicker;
+    private Trigger currentTrigger;
     private EditText mGPSLocationText;
+    private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
     private String[] triggerArray;
     private String[] actionArray;
     private EditText mNameText;
@@ -156,7 +172,24 @@ public class CreateActivity extends AppCompatActivity {
         mButtonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                triggerSpinner = (Spinner) findViewById(R.id.trigger_spinner);
+                actionSpinner = (Spinner) findViewById(R.id.action_spinner);
+                contactNumber = (EditText) findViewById(R.id.contact_name);
+                message = (EditText) findViewById(R.id.message_text);
+                actionName = (EditText) findViewById(R.id.action_name);
+                timePicker = (TimePicker) findViewById(R.id.timePicker);
+                currentTrigger = new Trigger(triggerSpinner.getSelectedItem().toString(),
+                        actionSpinner.getSelectedItem().toString(),
+                        contactNumber.getText().toString(), message.getText().toString(),
+                        actionName.getText().toString(), timePicker.getCurrentHour(),
+                        timePicker.getCurrentMinute());
+                triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
+                triggerArrayList.add(currentTrigger);
+                //used this to make sure my trigger class was extracting all the information in the class
+                saveSharedPreferencesLogList(CreateActivity.this, triggerArrayList);
+                Log.d("actionName", "onClick: " + triggerArrayList.get(0).getActionName());
                 Intent saveAction = new Intent(v.getContext(), TriggerActivity.class);
+                saveAction.putExtra("actionName",currentTrigger.getActionName());
                 startActivity(saveAction);
             }
         });
@@ -292,7 +325,6 @@ public class CreateActivity extends AppCompatActivity {
             contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
         }
         cursor.close();
-    }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){
@@ -358,5 +390,24 @@ public class CreateActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public static void saveSharedPreferencesLogList(Context context, ArrayList<Trigger> triggerArrayList) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor  mEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(triggerArrayList);
+        mEditor.putString("TriggerList", json);
+        mEditor.commit();
+    }
+
+    public static ArrayList<Trigger> getSharedPreferencesLogList(Context context) {
+        ArrayList<Trigger> triggerArrayList = new ArrayList<>();
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor  mEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = mPrefs.getString("TriggerList", "");
+        Type type = new TypeToken<ArrayList<Trigger>>(){}.getType();
+        triggerArrayList = gson.fromJson(json, type);
+        return triggerArrayList;
+    }
 
 }
