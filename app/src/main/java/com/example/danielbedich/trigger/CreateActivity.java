@@ -203,8 +203,8 @@ public class CreateActivity extends AppCompatActivity {
         Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
                 ContactsContract.CommonDataKinds.Phone.CONTACT_ID+" = ? AND "
-                + ContactsContract.CommonDataKinds.Phone.TYPE+" = "
-                + ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
+                        + ContactsContract.CommonDataKinds.Phone.TYPE+" = "
+                        + ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
                 new String[]{contactID},null);
 
         if (cursorPhone.moveToFirst()) {

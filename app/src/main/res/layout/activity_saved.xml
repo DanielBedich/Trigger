@@ -9,7 +9,7 @@
     <ListView
         android:layout_width = "match_parent"
         android:layout_height = "300dp"
-        android:entries="@array/triggerList"
+        android:id="@+id/savedlist"
         android:layout_weight="0.55">
     </ListView>
 
