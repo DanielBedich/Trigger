@@ -57,28 +57,29 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/message_text"/>
 
-    <LinearLayout
+    <Button
+        android:id="@+id/save_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@+id/timePicker">
+        android:text="@string/save_button"
+        android:layout_marginLeft="62dp"
+        android:layout_marginStart="62dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/action_name"
+        android:layout_alignStart="@+id/action_name"/>
 
-        <Button
-            android:id="@+id/save_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/save_button" />
-
-        <Button
-            android:id="@+id/cancel_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cancel_button" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel_button"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/save_button"
+        android:layout_toEndOf="@+id/save_button"/>
 
     <TimePicker
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="135dp"
         android:timePickerMode="spinner"
         android:id="@+id/timePicker"
         android:layout_below="@+id/action_name"

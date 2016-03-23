@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Trigger.iml" filepath="$PROJECT_DIR$/Trigger.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/trigger.iml" filepath="$PROJECT_DIR$/trigger.iml" />
     </modules>
   </component>
 </project>
