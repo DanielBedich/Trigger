@@ -1,18 +1,30 @@
 package com.example.danielbedich.trigger;
 
+import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TimePicker;
 import android.widget.Toast;
+import android.app.TimePickerDialog;
 
 public class CreateActivity extends AppCompatActivity {
 
@@ -24,13 +36,88 @@ public class CreateActivity extends AppCompatActivity {
     private EditText mMessageText;
     private String contactID;
     private Uri uriContact;
+    private NotificationManager mNotificationManager;
+    private Spinner mSpinnerTrigger;
+    private Spinner mSpinnerAction;
+    private TimePicker mTimePicker;
+
+    private String[] triggerArray;
+    private String[] actionArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mMessageText = (EditText) findViewById(R.id.message_text);
+        mSpinnerAction = (Spinner) findViewById(R.id.action_spinner);
+
+        actionArray = getResources().getStringArray(R.array.actionArray);
+        ArrayAdapter<String> adapterSpinnerAction  = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_dropdown_item, actionArray);
+
+        mSpinnerAction.setAdapter(adapterSpinnerAction);
+        mSpinnerAction.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (mSpinnerAction.getSelectedItem().toString().equals("Call")) {
+                    mMessageText.setEnabled(false);
+                    mMessageText.setInputType(InputType.TYPE_NULL);
+                    mMessageText.setText(null);
+                    //mMessageText.setFocusable(false);
+                } else {
+                    mMessageText.setEnabled(true);
+                    mMessageText.setInputType(InputType.TYPE_CLASS_TEXT);
+                    //mMessageText.setFocusable(true);
+                }
+
+                if (mSpinnerAction.getSelectedItem().toString().equals("Reminder")) {
+                    mContactText.setEnabled(false);
+                    mContactText.setInputType(InputType.TYPE_NULL);
+                    mContactText.setText(null);
+                    //mMessageText.setFocusable(false);
+
+                } else {
+                    mContactText.setEnabled(true);
+                    mContactText.setInputType(InputType.TYPE_CLASS_TEXT);
+                    //mMessageText.setFocusable(true);
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        mTimePicker = (TimePicker) findViewById(R.id.timePicker);
+        mSpinnerTrigger = (Spinner) findViewById(R.id.trigger_spinner);
+
+        triggerArray = getResources().getStringArray(R.array.triggerArray);
+        ArrayAdapter<String> adapterSpinnerTrigger  = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_dropdown_item, triggerArray);
+
+        mSpinnerTrigger.setAdapter(adapterSpinnerTrigger);
+        mSpinnerTrigger.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(mSpinnerTrigger.getSelectedItem().toString().equals("Time")){
+                    mTimePicker.setEnabled(true);
+                } else {
+                    mTimePicker.setEnabled(false);
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
 
         mButtonSave = (Button) findViewById(R.id.save_button);
         mButtonSave.setOnClickListener(new View.OnClickListener() {
@@ -48,11 +135,33 @@ public class CreateActivity extends AppCompatActivity {
                 Intent cancelAction = new Intent(v.getContext(), TriggerActivity.class);
                 startActivity(cancelAction);
 
+
+                NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(v.getContext());
+                notifBuilder.setSmallIcon(R.drawable.common_google_signin_btn_icon_dark);
+                notifBuilder.setContentTitle("Trigger");
+                notifBuilder.setTicker("New Trigger!");
+                notifBuilder.setContentText(mMessageText.getText().toString());
+
+                long[] vibrateTime = {2000};
+                notifBuilder.setVibrate(vibrateTime);
+                Intent resultIntent = new Intent(CreateActivity.this, TriggerActivity.class);
+                PendingIntent resultPendingIntent = PendingIntent.getActivity(CreateActivity.this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                notifBuilder.setContentIntent(resultPendingIntent);
+                mNotificationManager.notify(1, notifBuilder.build());
+/**
+                //Call the specified number
+                Intent call = new Intent(Intent.ACTION_CALL);
+                call.setData(Uri.parse("tel:" + mContactText.getText().toString()));
+                if(PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.CALL_PHONE)) {
+                    startActivity(call);
+                }
+
                 //How to text someone
                 SmsManager smsMan = SmsManager.getDefault();
                 String num = mContactText.getText().toString();
                 String mes= mMessageText.getText().toString();
                 smsMan.sendTextMessage(num,null,mes,null, null);
+ */
             }
         });
 
