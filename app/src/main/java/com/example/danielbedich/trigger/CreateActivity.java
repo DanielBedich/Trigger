@@ -29,6 +29,7 @@ import android.app.TimePickerDialog;
 public class CreateActivity extends AppCompatActivity {
 
     private static final int CONTACT_PICKER = 1;
+    private static final int LOCATION_PICKER = 1;
     private static final String DEBUG_TAG = null;
     private Button mButtonSave;
     private Button mButtonCancel;
@@ -40,7 +41,7 @@ public class CreateActivity extends AppCompatActivity {
     private Spinner mSpinnerTrigger;
     private Spinner mSpinnerAction;
     private TimePicker mTimePicker;
-
+    private EditText mGPSLocationText;
     private String[] triggerArray;
     private String[] actionArray;
 
@@ -48,6 +49,15 @@ public class CreateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
+
+        mGPSLocationText = (EditText) findViewById(R.id.gps_location);
+        mGPSLocationText.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent gpsAction = new Intent(v.getContext(), MapsActivity.class);
+                startActivity(gpsAction);
+            }
+        });
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mMessageText = (EditText) findViewById(R.id.message_text);
@@ -65,10 +75,12 @@ public class CreateActivity extends AppCompatActivity {
                     mMessageText.setEnabled(false);
                     mMessageText.setInputType(InputType.TYPE_NULL);
                     mMessageText.setText(null);
+                    mMessageText.setVisibility(View.GONE);
                     //mMessageText.setFocusable(false);
                 } else {
                     mMessageText.setEnabled(true);
                     mMessageText.setInputType(InputType.TYPE_CLASS_TEXT);
+                    mMessageText.setVisibility(View.VISIBLE);
                     //mMessageText.setFocusable(true);
                 }
 
@@ -76,11 +88,13 @@ public class CreateActivity extends AppCompatActivity {
                     mContactText.setEnabled(false);
                     mContactText.setInputType(InputType.TYPE_NULL);
                     mContactText.setText(null);
+                    mContactText.setVisibility(View.GONE);
                     //mMessageText.setFocusable(false);
 
                 } else {
                     mContactText.setEnabled(true);
                     mContactText.setInputType(InputType.TYPE_CLASS_TEXT);
+                    mContactText.setVisibility(View.VISIBLE);
                     //mMessageText.setFocusable(true);
                 }
 
@@ -105,8 +119,12 @@ public class CreateActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(mSpinnerTrigger.getSelectedItem().toString().equals("Time")){
                     mTimePicker.setEnabled(true);
+                    mTimePicker.setVisibility(View.VISIBLE);
+                    mGPSLocationText.setVisibility(View.GONE);
                 } else {
                     mTimePicker.setEnabled(false);
+                    mTimePicker.setVisibility(View.GONE);
+                    mGPSLocationText.setVisibility(View.VISIBLE);
                 }
 
             }
