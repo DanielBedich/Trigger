@@ -30,6 +30,8 @@ public class CreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
+        mMessageText = (EditText) findViewById(R.id.message_text);
+
         mButtonSave = (Button) findViewById(R.id.save_button);
         mButtonSave.setOnClickListener(new View.OnClickListener() {
             @Override
