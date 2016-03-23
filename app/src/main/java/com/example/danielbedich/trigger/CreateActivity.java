@@ -5,9 +5,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,10 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.app.TimePickerDialog;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+
 public class CreateActivity extends AppCompatActivity {
 
     private static final int CONTACT_PICKER = 1;
@@ -40,7 +46,15 @@ public class CreateActivity extends AppCompatActivity {
     private Spinner mSpinnerTrigger;
     private Spinner mSpinnerAction;
     private TimePicker mTimePicker;
+    private EditText contactNumber;
+    private EditText message;
+    private EditText actionName;
+    private Spinner triggerSpinner;
+    private Spinner actionSpinner;
+    private TimePicker timePicker;
+    private Trigger currentTrigger;
 
+    private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
     private String[] triggerArray;
     private String[] actionArray;
 
@@ -123,7 +137,23 @@ public class CreateActivity extends AppCompatActivity {
         mButtonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                triggerSpinner = (Spinner) findViewById(R.id.trigger_spinner);
+                actionSpinner = (Spinner) findViewById(R.id.action_spinner);
+                contactNumber = (EditText) findViewById(R.id.contact_name);
+                message = (EditText) findViewById(R.id.message_text);
+                actionName = (EditText) findViewById(R.id.action_name);
+                timePicker = (TimePicker) findViewById(R.id.timePicker);
+                currentTrigger = new Trigger(triggerSpinner.getSelectedItem().toString(),
+                        actionSpinner.getSelectedItem().toString(),
+                        contactNumber.getText().toString(), message.getText().toString(),
+                        actionName.getText().toString(), timePicker.getCurrentHour(),
+                        timePicker.getCurrentMinute());
+                triggerArrayList.add(currentTrigger);
+                //used this to make sure my trigger class was extracting all the information in the class
+                Log.d("actionName", "onClick: " + currentTrigger.getActionName());
+                saveSharedPreferencesLogList(CreateActivity.this, triggerArrayList);
                 Intent saveAction = new Intent(v.getContext(), TriggerActivity.class);
+                saveAction.putExtra("actionName",currentTrigger.getActionName());
                 startActivity(saveAction);
             }
         });
@@ -230,6 +260,15 @@ public class CreateActivity extends AppCompatActivity {
         }
         cursor.close();
 
+    }
+
+    public static void saveSharedPreferencesLogList(Context context, ArrayList<Trigger> triggerArrayList) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor  mEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(triggerArrayList);
+        mEditor.putString("TriggerList", json);
+        mEditor.commit();
     }
 
 
