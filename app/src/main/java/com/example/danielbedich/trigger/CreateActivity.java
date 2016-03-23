@@ -29,7 +29,9 @@ import android.widget.Toast;
 import android.app.TimePickerDialog;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class CreateActivity extends AppCompatActivity {
@@ -148,10 +150,11 @@ public class CreateActivity extends AppCompatActivity {
                         contactNumber.getText().toString(), message.getText().toString(),
                         actionName.getText().toString(), timePicker.getCurrentHour(),
                         timePicker.getCurrentMinute());
+                triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
                 triggerArrayList.add(currentTrigger);
                 //used this to make sure my trigger class was extracting all the information in the class
-                Log.d("actionName", "onClick: " + currentTrigger.getActionName());
                 saveSharedPreferencesLogList(CreateActivity.this, triggerArrayList);
+                Log.d("actionName", "onClick: " + triggerArrayList.get(0).getActionName());
                 Intent saveAction = new Intent(v.getContext(), TriggerActivity.class);
                 saveAction.putExtra("actionName",currentTrigger.getActionName());
                 startActivity(saveAction);
@@ -271,5 +274,15 @@ public class CreateActivity extends AppCompatActivity {
         mEditor.commit();
     }
 
+    public static ArrayList<Trigger> getSharedPreferencesLogList(Context context) {
+        ArrayList<Trigger> triggerArrayList = new ArrayList<>();
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor  mEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = mPrefs.getString("TriggerList", "");
+        Type type = new TypeToken<ArrayList<Trigger>>(){}.getType();
+        triggerArrayList = gson.fromJson(json, type);
+        return triggerArrayList;
+    }
 
 }

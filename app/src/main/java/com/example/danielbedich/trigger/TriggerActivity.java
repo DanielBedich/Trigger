@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -25,20 +26,22 @@ public class TriggerActivity extends AppCompatActivity {
 
     private Button mButtonNew;
     private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
+    ArrayList<String> triggers = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trigger);
         //how to dynamically add items to the list
         //need to learn how to save activity details for when the app closes and then use those activity names to refill list
-        ArrayList<String> triggers = new ArrayList<>();
-        if(this.getIntent().getStringExtra("actionName") != null) {
-            triggers.add(this.getIntent().getStringExtra("actionName"));
+        triggers = getSharedPreferencesLogList(TriggerActivity.this);
+        triggers.add(this.getIntent().getStringExtra("actionName"));
+        saveSharedPreferencesLogList(TriggerActivity.this, triggers);
+        Log.d("actionName", "onClick: " + triggers.toString());
+        if(!triggers.isEmpty()) {
+            ListView listView = (ListView) findViewById(R.id.triggerlist);
+            StringArrayAdapter listAdapter = new StringArrayAdapter(triggers, this);
+            listView.setAdapter(listAdapter);
         }
-        ListView listView = (ListView)findViewById(R.id.triggerlist);
-        StringArrayAdapter listAdapter = new StringArrayAdapter(triggers, this);
-        listView.setAdapter(listAdapter);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -66,15 +69,24 @@ public class TriggerActivity extends AppCompatActivity {
         });
     }
 
-    public static ArrayList<Trigger> getSharedPreferencesLogList(Context context) {
-        ArrayList<Trigger> triggerArrayList = new ArrayList<>();
+    public static void saveSharedPreferencesLogList(Context context, ArrayList<String> triggers){
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor  mEditor = mPrefs.edit();
         Gson gson = new Gson();
-        String json = mPrefs.getString("TriggerList", "");
-        Type type = new TypeToken<ArrayList<Trigger>>(){}.getType();
-        triggerArrayList = gson.fromJson(json, type);
-        return triggerArrayList;
+        String json = gson.toJson(triggers);
+        mEditor.putString("Triggers", json);
+        mEditor.commit();
+    }
+
+    public static ArrayList<String> getSharedPreferencesLogList(Context context) {
+        ArrayList<String> triggers = new ArrayList<>();
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor  mEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = mPrefs.getString("Triggers", "");
+        Type type = new TypeToken<ArrayList<String>>(){}.getType();
+        triggers = gson.fromJson(json, type);
+        return triggers;
     }
 
 }
