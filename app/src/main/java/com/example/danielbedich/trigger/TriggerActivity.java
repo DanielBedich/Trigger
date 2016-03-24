@@ -89,6 +89,7 @@ public class TriggerActivity extends AppCompatActivity {
         Gson gson = new Gson();
         String json = mPrefs.getString("Triggers", "");
         Type type = new TypeToken<ArrayList<String>>(){}.getType();
+        //catch null lists
         if(gson.fromJson(json, type)!=null) {
             triggers = gson.fromJson(json, type);
         }
