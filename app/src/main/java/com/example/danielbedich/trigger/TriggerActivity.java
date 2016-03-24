@@ -26,18 +26,21 @@ public class TriggerActivity extends AppCompatActivity {
 
     private Button mButtonNew;
     private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
-    ArrayList<String> triggers = new ArrayList<>();
+    private SharedPreferences mPrefs;
+    private ArrayList<String> triggers = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trigger);
         //how to dynamically add items to the list
         //need to learn how to save activity details for when the app closes and then use those activity names to refill list
+
         triggers = getSharedPreferencesLogList(TriggerActivity.this);
+
         if(this.getIntent().getStringExtra("actionName") !=null) {
             triggers.add(this.getIntent().getStringExtra("actionName"));
         }
-        if(triggers!=null) {
+        if(triggers != null) {
             saveSharedPreferencesLogList(TriggerActivity.this, triggers);
             Log.d("actionName", "onClick: " + triggers.toString());
             ListView listView = (ListView) findViewById(R.id.triggerlist);
@@ -87,7 +90,9 @@ public class TriggerActivity extends AppCompatActivity {
         Gson gson = new Gson();
         String json = mPrefs.getString("Triggers", "");
         Type type = new TypeToken<ArrayList<String>>(){}.getType();
-        triggers = gson.fromJson(json, type);
+        if(gson.fromJson(json, type)!=null) {
+            triggers = gson.fromJson(json, type);
+        }
         return triggers;
     }
 
