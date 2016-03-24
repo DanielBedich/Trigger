@@ -79,12 +79,13 @@ public class CreateActivity extends AppCompatActivity {
     private String[] triggerArray;
     private String[] actionArray;
     private EditText mNameText;
+    private SharedPreferences mPrefs;
     String location;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
-
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(CreateActivity.this);
         mNameText = (EditText) findViewById(R.id.action_name);
 
         mGPSLocationText = (EditText) findViewById(R.id.gps_location);
@@ -183,11 +184,14 @@ public class CreateActivity extends AppCompatActivity {
                         contactNumber.getText().toString(), message.getText().toString(),
                         actionName.getText().toString(), timePicker.getCurrentHour(),
                         timePicker.getCurrentMinute());
-                triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
+                String value = mPrefs.getString("TriggerList",null);
+                if (value != null) {
+                    triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
+                }
+
                 triggerArrayList.add(currentTrigger);
                 //used this to make sure my trigger class was extracting all the information in the class
                 saveSharedPreferencesLogList(CreateActivity.this, triggerArrayList);
-                Log.d("actionName", "onClick: " + triggerArrayList.get(0).getActionName());
                 Intent saveAction = new Intent(v.getContext(), TriggerActivity.class);
                 saveAction.putExtra("actionName",currentTrigger.getActionName());
                 startActivity(saveAction);

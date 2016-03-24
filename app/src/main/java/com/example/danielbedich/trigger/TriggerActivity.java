@@ -26,25 +26,32 @@ public class TriggerActivity extends AppCompatActivity {
 
     private Button mButtonNew;
     private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
-    ArrayList<String> triggers = new ArrayList<>();
+    private SharedPreferences mPrefs;
+    private ArrayList<String> triggers = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trigger);
         //how to dynamically add items to the list
         //need to learn how to save activity details for when the app closes and then use those activity names to refill list
-        triggers = getSharedPreferencesLogList(TriggerActivity.this);
+        if(mPrefs!=null) {
+            String value = mPrefs.getString("Triggers", null);
+            if (value != null) {
+                triggers = getSharedPreferencesLogList(TriggerActivity.this);
+            }
+        }
         if(this.getIntent().getStringExtra("actionName") !=null) {
             triggers.add(this.getIntent().getStringExtra("actionName"));
         }
-        saveSharedPreferencesLogList(TriggerActivity.this, triggers);
-        Log.d("actionName", "onClick: " + triggers.toString());
+        if(triggers != null) {
+            saveSharedPreferencesLogList(TriggerActivity.this, triggers);
+            Log.d("actionName", "onClick: " + triggers.toString());
             ListView listView = (ListView) findViewById(R.id.triggerlist);
             StringArrayAdapter listAdapter = new StringArrayAdapter(triggers, this);
             listView.setAdapter(listAdapter);
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         mButtonNew = (Button) findViewById(R.id.new_button);
         mButtonNew.setOnClickListener(new View.OnClickListener(){
