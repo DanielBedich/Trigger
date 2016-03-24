@@ -37,11 +37,13 @@ public class TriggerActivity extends AppCompatActivity {
         if(this.getIntent().getStringExtra("actionName") !=null) {
             triggers.add(this.getIntent().getStringExtra("actionName"));
         }
-        saveSharedPreferencesLogList(TriggerActivity.this, triggers);
-        Log.d("actionName", "onClick: " + triggers.toString());
+        if(triggers!=null) {
+            saveSharedPreferencesLogList(TriggerActivity.this, triggers);
+            Log.d("actionName", "onClick: " + triggers.toString());
             ListView listView = (ListView) findViewById(R.id.triggerlist);
             StringArrayAdapter listAdapter = new StringArrayAdapter(triggers, this);
             listView.setAdapter(listAdapter);
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

@@ -35,7 +35,10 @@ import android.widget.Toast;
 import android.app.TimePickerDialog;
 
 import java.io.IOException;
+import java.sql.Time;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -201,7 +204,7 @@ public class CreateActivity extends AppCompatActivity {
                 //Intent cancelAction = new Intent(v.getContext(), TriggerActivity.class);
                 //startActivity(cancelAction);
 
-
+                /*
                 Geocoder geocoder = new Geocoder(getApplicationContext());
                 List<Address> addresses = null;
                 try{
@@ -215,9 +218,29 @@ public class CreateActivity extends AppCompatActivity {
                     mMessageText.setText(latitude+"");
                     mContactText.setText(longitude+"");
                 }
+                Toast.makeText(CreateActivity.this, "hourDiff "+hourDiff, Toast.LENGTH_LONG).show();
+
+                int minDiff = (mTimePicker.getCurrentMinute()-c.get(Calendar.MINUTE))*60;
+                if(minDiff==0){
+                    minDiff=1;
+                }
+                Toast.makeText(CreateActivity.this, "minDiff "+minDiff, Toast.LENGTH_LONG).show();
+
+
+                Long time2 =  new GregorianCalendar().getTimeInMillis()+hourDiff*minDiff*1000;
+
+                Intent intentAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
+                Bundle b = new Bundle();
+                b.putString("Num", mContactText.getText().toString());
+                b.putString("Mes", mMessageText.getText().toString());
+                intentAlarm.putExtras(b);
+                AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+                alarmManager.set(AlarmManager.RTC_WAKEUP, time2, PendingIntent.getBroadcast(CreateActivity.this, 1, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+                Toast.makeText(CreateActivity.this, "Alarm Scheduled for "+timeStamp.toString(), Toast.LENGTH_LONG).show();
 
                 //create an AlarmManager for scenario of picking time
-                Intent timeIntent = new Intent(CreateActivity.this, TriggerExecution.class);
+                /*Intent timeIntent = new Intent(CreateActivity.this, TriggerExecution.class);
                 PendingIntent pendTimeIntent = PendingIntent.getService(CreateActivity.this, 1, timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 AlarmManager alarmMan = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
@@ -229,8 +252,8 @@ public class CreateActivity extends AppCompatActivity {
                  cal.add(Calendar.MINUTE, mTimePicker.getCurrentMinute());
                  cal.add(Calendar.SECOND, 0);
                  cal.add(Calendar.MILLISECOND, 0);
-                 */
-                alarmMan.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendTimeIntent);
+
+                alarmMan.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendTimeIntent);*/
 
                 /*
                 NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(v.getContext());

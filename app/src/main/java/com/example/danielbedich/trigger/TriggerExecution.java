@@ -24,8 +24,18 @@ public class TriggerExecution extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Toast.makeText(context, "Received", Toast.LENGTH_LONG).show();
-        sendSms("3307745286", "hello");
+
+
+        SmsManager sms = SmsManager.getDefault();
+        sms.sendTextMessage(intent.getStringExtra("Num"),null,intent.getStringExtra("Mes"),null,null);
+        Toast.makeText(context, "Alarm Triggered and SMS Sent", Toast.LENGTH_LONG).show();
+        /*
+        try {
+            Toast.makeText(context, "Received", Toast.LENGTH_LONG).show();
+            sendSms("3307745286", "hello");
+        } catch (Exception e){
+            Toast.makeText(context, "There was an error somewhere, but we still received an alarm" + e, Toast.LENGTH_LONG).show();
+        }*/
     }
 
     /**
