@@ -76,6 +76,7 @@ public class CreateActivity extends AppCompatActivity {
     private Trigger currentTrigger;
     private EditText mGPSLocationText;
     private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
+    private ArrayList<Trigger> triggerArrayListTemp = new ArrayList<>();
     private String[] triggerArray;
     private String[] actionArray;
     private EditText mNameText;
@@ -184,10 +185,8 @@ public class CreateActivity extends AppCompatActivity {
                         contactNumber.getText().toString(), message.getText().toString(),
                         actionName.getText().toString(), timePicker.getCurrentHour(),
                         timePicker.getCurrentMinute());
-                String value = mPrefs.getString("TriggerList",null);
-                if (value != null) {
-                    triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
-                }
+
+                triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
 
                 triggerArrayList.add(currentTrigger);
                 //used this to make sure my trigger class was extracting all the information in the class
@@ -410,7 +409,9 @@ public class CreateActivity extends AppCompatActivity {
         Gson gson = new Gson();
         String json = mPrefs.getString("TriggerList", "");
         Type type = new TypeToken<ArrayList<Trigger>>(){}.getType();
-        triggerArrayList = gson.fromJson(json, type);
+        if(gson.fromJson(json, type)!=null) {
+            triggerArrayList = gson.fromJson(json, type);
+        }
         return triggerArrayList;
     }
 

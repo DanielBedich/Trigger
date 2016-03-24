@@ -34,12 +34,9 @@ public class TriggerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_trigger);
         //how to dynamically add items to the list
         //need to learn how to save activity details for when the app closes and then use those activity names to refill list
-        if(mPrefs!=null) {
-            String value = mPrefs.getString("Triggers", null);
-            if (value != null) {
-                triggers = getSharedPreferencesLogList(TriggerActivity.this);
-            }
-        }
+
+        triggers = getSharedPreferencesLogList(TriggerActivity.this);
+
         if(this.getIntent().getStringExtra("actionName") !=null) {
             triggers.add(this.getIntent().getStringExtra("actionName"));
         }
@@ -92,7 +89,9 @@ public class TriggerActivity extends AppCompatActivity {
         Gson gson = new Gson();
         String json = mPrefs.getString("Triggers", "");
         Type type = new TypeToken<ArrayList<String>>(){}.getType();
-        triggers = gson.fromJson(json, type);
+        if(gson.fromJson(json, type)!=null) {
+            triggers = gson.fromJson(json, type);
+        }
         return triggers;
     }
 
