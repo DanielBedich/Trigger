@@ -468,6 +468,7 @@ public class CreateActivity extends AppCompatActivity {
         Gson gson = new Gson();
         String json = mPrefs.getString("TriggerList", "");
         Type type = new TypeToken<ArrayList<Trigger>>(){}.getType();
+        //catch null lists
         if(gson.fromJson(json, type)!=null) {
             triggerArrayList = gson.fromJson(json, type);
         }
