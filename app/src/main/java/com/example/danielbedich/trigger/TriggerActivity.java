@@ -22,12 +22,11 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class TriggerActivity extends AppCompatActivity {
+public class TriggerActivity extends AppCompatActivity{
 
     private Button mButtonNew;
-    private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
-    private SharedPreferences mPrefs;
     private ArrayList<String> triggers = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,22 +51,22 @@ public class TriggerActivity extends AppCompatActivity {
 
 
         mButtonNew = (Button) findViewById(R.id.new_button);
-        mButtonNew.setOnClickListener(new View.OnClickListener(){
+        mButtonNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TriggerActivity.this);
-                builder.setPositiveButton("New", new DialogInterface.OnClickListener(){
-                    public void onClick(DialogInterface dialog, int id){
+                builder.setPositiveButton("New", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
                         Intent newAction = new Intent(TriggerActivity.this, CreateActivity.class);
                         startActivity(newAction);
                     }
                 })
-                .setNegativeButton("Save", new DialogInterface.OnClickListener(){
-                    public void onClick(DialogInterface dialog, int id){
-                        Intent saveAction = new Intent(TriggerActivity.this, SavedActivity.class);
-                        startActivity(saveAction);
-                    }
-                });
+                        .setNegativeButton("Save", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent saveAction = new Intent(TriggerActivity.this, SavedActivity.class);
+                                startActivity(saveAction);
+                            }
+                        });
                 builder.show();
             }
 
@@ -90,6 +89,7 @@ public class TriggerActivity extends AppCompatActivity {
         Gson gson = new Gson();
         String json = mPrefs.getString("Triggers", "");
         Type type = new TypeToken<ArrayList<String>>(){}.getType();
+        //catch null lists
         if(gson.fromJson(json, type)!=null) {
             triggers = gson.fromJson(json, type);
         }
