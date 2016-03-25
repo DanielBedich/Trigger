@@ -95,7 +95,8 @@ public class CreateActivity extends AppCompatActivity {
     private LocationManager mLocationManager;
     private LatLng currentCoord;
     private LatLng destination;
-    private int NOTIF_ID=0;
+    private int NOTIF_ID = 0;
+    //private boolean gpsFlag = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,31 +116,25 @@ public class CreateActivity extends AppCompatActivity {
 
         //Trigger roles and setting visible elements
         triggerArray = getResources().getStringArray(R.array.triggerArray);
-        ArrayAdapter<String> adapterSpinnerTrigger  = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapterSpinnerTrigger = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_dropdown_item, triggerArray);
 
         mSpinnerTrigger.setAdapter(adapterSpinnerTrigger);
         mSpinnerTrigger.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(mSpinnerTrigger.getSelectedItem().toString().equals("Time")){
+                if (mSpinnerTrigger.getSelectedItem().toString().equals("Time")) {
                     mTimePicker.setEnabled(true);
                     mTimePicker.setVisibility(View.VISIBLE);
                     mGPSLocationText.setVisibility(View.GONE);
-                    triggerFlag=1;
+                    triggerFlag = 1;
                 } else {
-                    triggerFlag=2;
+                    triggerFlag = 2;
                     mTimePicker.setEnabled(false);
                     mTimePicker.setVisibility(View.GONE);
                     mGPSLocationText.setVisibility(View.VISIBLE);
 
-                    //setup to get current location
-                    mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                    if(PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
-                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, (long) 5, (float) 5, mLocationListener);
-                        //Location loc = new Location("285 E 15th Ave Columbus, Ohio");
-                        //mLocationListener.onLocationChanged(loc);
-                    }
+
 
                 }
 
@@ -154,7 +149,7 @@ public class CreateActivity extends AppCompatActivity {
 
         //Action roles and setting visible elements
         actionArray = getResources().getStringArray(R.array.actionArray);
-        ArrayAdapter<String> adapterSpinnerAction  = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapterSpinnerAction = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_dropdown_item, actionArray);
 
         mSpinnerAction.setAdapter(adapterSpinnerAction);
@@ -166,7 +161,7 @@ public class CreateActivity extends AppCompatActivity {
                     mMessageText.setInputType(InputType.TYPE_NULL);
                     mMessageText.setText(null);
                     mMessageText.setVisibility(View.GONE);
-                    actionFlag=3;
+                    actionFlag = 3;
                 } else {
                     mMessageText.setEnabled(true);
                     mMessageText.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -178,7 +173,7 @@ public class CreateActivity extends AppCompatActivity {
                     mContactText.setInputType(InputType.TYPE_NULL);
                     mContactText.setText(null);
                     mContactText.setVisibility(View.GONE);
-                    actionFlag=1;
+                    actionFlag = 1;
 
                 } else {
                     mContactText.setEnabled(true);
@@ -186,7 +181,7 @@ public class CreateActivity extends AppCompatActivity {
                     mContactText.setVisibility(View.VISIBLE);
                 }
                 if (mSpinnerAction.getSelectedItem().toString().equals("SMS")) {
-                    actionFlag=2;
+                    actionFlag = 2;
                 }
             }
 
@@ -214,58 +209,57 @@ public class CreateActivity extends AppCompatActivity {
 
                 triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
 
-                triggerArrayList.add(currentTrigger);
-                //used this to make sure my trigger class was extracting all the information in the class
-                saveSharedPreferencesLogList(CreateActivity.this, triggerArrayList);
-                Intent saveAction = new Intent(v.getContext(), TriggerActivity.class);
-                saveAction.putExtra("actionName",currentTrigger.getActionName());
-                startActivity(saveAction);
-            }
-        });
 
-        mButtonCancel = (Button) findViewById(R.id.cancel_button);
-        mButtonCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(triggerFlag==1){
+
+
+                //setup to get current location
+                mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                if (PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, (long) 5, (float) 5, mLocationListener);
+                    //Location loc = new Location("285 E 15th Ave Columbus, Ohio");
+                    //mLocationListener.onLocationChanged(loc);
+                }
+
+
+                if (triggerFlag == 1) {
                     //Timer code
 
 
                     NOTIF_ID++;
                     Calendar c = Calendar.getInstance();
 
-                    int hourDiff = (mTimePicker.getCurrentHour()-c.get(Calendar.HOUR_OF_DAY))*60;
-                    Toast.makeText(CreateActivity.this, "hourDiff "+hourDiff, Toast.LENGTH_LONG).show();
-                    if(hourDiff==0){
-                        hourDiff=1;
+                    int hourDiff = (mTimePicker.getCurrentHour() - c.get(Calendar.HOUR_OF_DAY)) * 60;
+                    Toast.makeText(CreateActivity.this, "hourDiff " + hourDiff, Toast.LENGTH_LONG).show();
+                    if (hourDiff == 0) {
+                        hourDiff = 1;
                     }
 
-                    int minDiff = (mTimePicker.getCurrentMinute()-c.get(Calendar.MINUTE))*60;
-                    if(minDiff==0){
-                        minDiff=1;
+                    int minDiff = (mTimePicker.getCurrentMinute() - c.get(Calendar.MINUTE)) * 60;
+                    if (minDiff == 0) {
+                        minDiff = 1;
                     }
-                    Toast.makeText(CreateActivity.this, "minDiff "+minDiff, Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreateActivity.this, "minDiff " + minDiff, Toast.LENGTH_LONG).show();
 
-                    Date timeStamp = new Date(c.get(Calendar.YEAR),c.get(Calendar.MONTH),c.get(Calendar.DAY_OF_MONTH),mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
+                    Date timeStamp = new Date(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
 
-                    Long time =  new GregorianCalendar().getTimeInMillis()+hourDiff*minDiff*1000;
+                    Long time = new GregorianCalendar().getTimeInMillis() + hourDiff * minDiff * 1000;
 
                     Intent intentAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
                     Bundle b = new Bundle();
-                    switch(actionFlag){
+                    switch (actionFlag) {
                         case 1: //reminder
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Mes", mMessageText.getText().toString());
                             b.putInt("id", NOTIF_ID);
                             break;
                         case 2: //sms
-                            b.putInt("actionFlag",actionFlag);
+                            b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
                             b.putString("Mes", mMessageText.getText().toString());
                             b.putInt("id", NOTIF_ID);
                             break;
                         case 3:
-                            b.putInt("actionFlag",actionFlag);
+                            b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
                             b.putInt("id", NOTIF_ID);
                             break;
@@ -274,98 +268,39 @@ public class CreateActivity extends AppCompatActivity {
 
                     }
                     intentAlarm.putExtras(b);
-                    AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
                     alarmManager.set(AlarmManager.RTC_WAKEUP, time, PendingIntent.getBroadcast(CreateActivity.this, NOTIF_ID, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
-                    Toast.makeText(CreateActivity.this, "Alarm Scheduled for "+timeStamp.toString(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreateActivity.this, "Alarm Scheduled for " + timeStamp.toString(), Toast.LENGTH_LONG).show();
                 }
-                if(triggerFlag==2) {
+                if (triggerFlag == 2) {
                     //GPS Code
-                    Geocoder geocoder = new Geocoder(getApplicationContext());
-                    List<Address> addresses = null;
-                    double latitude;
-                    double longitude;
-                    float distance = 100000;
-                    Intent gpsAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
-                    try {
-                        addresses = geocoder.getFromLocationName(mGPSLocationText.getText().toString(), 1);
-                    } catch (IOException e) {
-
-                    }
-                    if (addresses.size() > 0) {
-                        latitude = addresses.get(0).getLatitude();
-                        longitude = addresses.get(0).getLongitude();
-                        destination = new LatLng(latitude, longitude);
-                    }
-                    if (destination != null && currentCoord != null) {
-                        Location current = new Location("");
-                        current.setLatitude(currentCoord.latitude);
-                        current.setLongitude(currentCoord.longitude);
-                        Location dest = new Location("");
-                        dest.setLatitude(destination.latitude);
-                        dest.setLongitude(destination.longitude);
-                        distance = current.distanceTo(dest);
-                        if(distance<50){
-                            Toast.makeText(CreateActivity.this, "B"+actionFlag, Toast.LENGTH_LONG).show();
-                            Bundle b = new Bundle();
-                            Toast.makeText(CreateActivity.this, "A"+actionFlag, Toast.LENGTH_LONG).show();
-                            switch(actionFlag){
-                                case 1: //reminder
-                                    b.putInt("actionFlag", actionFlag);
-                                    b.putString("Mes", mMessageText.getText().toString());
-                                    Toast.makeText(CreateActivity.this, "Reminder"+actionFlag, Toast.LENGTH_LONG).show();
-                                    break;
-                                case 2: //sms
-                                    b.putInt("actionFlag",actionFlag);
-                                    b.putString("Num", mContactText.getText().toString());
-                                    b.putString("Mes", mMessageText.getText().toString());
-                                    Toast.makeText(CreateActivity.this, "SMS"+actionFlag, Toast.LENGTH_LONG).show();
-                                    break;
-                                case 3:
-                                    b.putInt("actionFlag",actionFlag);
-                                    b.putString("Num", mContactText.getText().toString());
-                                    Toast.makeText(CreateActivity.this, "Call"+actionFlag, Toast.LENGTH_LONG).show();
-                                    break;
-                                default:
-                                    Toast.makeText(CreateActivity.this, "default", Toast.LENGTH_LONG).show();
-                                    break;
-
-                            }
-                            gpsAlarm.putExtras(b);
-                            sendBroadcast(gpsAlarm);
-                        }
-                        Toast.makeText(CreateActivity.this, distance + "", Toast.LENGTH_LONG).show();
-                    }
-                }
-                /*
-
-                */
-                //create an AlarmManager for scenario of picking time
-                /*Intent timeIntent = new Intent(CreateActivity.this, TriggerExecution.class);
-                PendingIntent pendTimeIntent = PendingIntent.getService(CreateActivity.this, 1, timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-
-                //Call the specified number
-                Intent call = new Intent(Intent.ACTION_CALL);
-                call.setData(Uri.parse("tel:" + mContactText.getText().toString()));
-                if(PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.CALL_PHONE)) {
-                    startActivity(call);
+                    //gpsFlag = true;
                 }
 
-                //How to text someone
-                SmsManager smsMan = SmsManager.getDefault();
-                String num = mContactText.getText().toString();
-                String mes= mMessageText.getText().toString();
-                smsMan.sendTextMessage(num,null,mes,null, null);
-*/
+
+                triggerArrayList.add(currentTrigger);
+                //used this to make sure my trigger class was extracting all the information in the class
+                saveSharedPreferencesLogList(CreateActivity.this, triggerArrayList);
+                Intent saveAction = new Intent(v.getContext(), TriggerActivity.class);
+                saveAction.putExtra("actionName", currentTrigger.getActionName());
+                startActivity(saveAction);
+            }
+        });
+
+        mButtonCancel = (Button) findViewById(R.id.cancel_button);
+        mButtonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cancelAction = new Intent(v.getContext(), TriggerActivity.class);
+                startActivity(cancelAction);
             }
         });
 
 
-        mContactText.setOnClickListener(new View.OnClickListener(){
+        mContactText.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
                 startActivityForResult(intent, CONTACT_PICKER);
@@ -375,10 +310,10 @@ public class CreateActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == CONTACT_PICKER && resultCode == RESULT_OK){
+        if (requestCode == CONTACT_PICKER && resultCode == RESULT_OK) {
 
             uriContact = data.getData();
             getContactName();
@@ -386,12 +321,12 @@ public class CreateActivity extends AppCompatActivity {
         }
     }
 
-    private void getContactNumber(){
+    private void getContactNumber() {
         String contactNumber = null;
 
-        Cursor cursorID = getContentResolver().query(uriContact, new String[]{ContactsContract.Contacts._ID},null, null,null);
+        Cursor cursorID = getContentResolver().query(uriContact, new String[]{ContactsContract.Contacts._ID}, null, null, null);
 
-        if(cursorID.moveToFirst()){
+        if (cursorID.moveToFirst()) {
             contactID = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
         }
 
@@ -399,10 +334,10 @@ public class CreateActivity extends AppCompatActivity {
 
         Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID+" = ? AND "
-                        + ContactsContract.CommonDataKinds.Phone.TYPE+" = "
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? AND "
+                        + ContactsContract.CommonDataKinds.Phone.TYPE + " = "
                         + ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
-                new String[]{contactID},null);
+                new String[]{contactID}, null);
 
         if (cursorPhone.moveToFirst()) {
             contactNumber = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
@@ -431,11 +366,70 @@ public class CreateActivity extends AppCompatActivity {
     private final LocationListener mLocationListener = new LocationListener() {
         double currentLat;
         double currentLong;
+
         @Override
         public void onLocationChanged(Location location) {
             currentLat = location.getLatitude();
             currentLong = location.getLongitude();
             currentCoord = new LatLng(currentLat, currentLong);
+
+            Geocoder geocoder = new Geocoder(getApplicationContext());
+            List<Address> addresses = null;
+            double latitude;
+            double longitude;
+            float distance = 100000;
+            Intent gpsAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
+            try {
+                addresses = geocoder.getFromLocationName(mGPSLocationText.getText().toString(), 1);
+            } catch (IOException e) {
+
+            }
+            if (addresses.size() > 0) {
+                latitude = addresses.get(0).getLatitude();
+                longitude = addresses.get(0).getLongitude();
+                destination = new LatLng(latitude, longitude);
+            }
+            if (destination != null && currentCoord != null) {
+                Location current = new Location("");
+                current.setLatitude(currentCoord.latitude);
+                current.setLongitude(currentCoord.longitude);
+                Location dest = new Location("");
+                dest.setLatitude(destination.latitude);
+                dest.setLongitude(destination.longitude);
+                distance = current.distanceTo(dest);
+                Toast.makeText(CreateActivity.this, distance+"", Toast.LENGTH_SHORT).show();
+                if (distance < 50) {
+                    //gpsFlag = false;
+                    Toast.makeText(CreateActivity.this, "B" + actionFlag, Toast.LENGTH_LONG).show();
+                    Bundle b = new Bundle();
+                    Toast.makeText(CreateActivity.this, "A" + actionFlag, Toast.LENGTH_LONG).show();
+                    switch (actionFlag) {
+                        case 1: //reminder
+                            b.putInt("actionFlag", actionFlag);
+                            b.putString("Mes", mMessageText.getText().toString());
+                            Toast.makeText(CreateActivity.this, "Reminder" + actionFlag, Toast.LENGTH_LONG).show();
+                            break;
+                        case 2: //sms
+                            b.putInt("actionFlag", actionFlag);
+                            b.putString("Num", mContactText.getText().toString());
+                            b.putString("Mes", mMessageText.getText().toString());
+                            Toast.makeText(CreateActivity.this, "SMS" + actionFlag, Toast.LENGTH_LONG).show();
+                            break;
+                        case 3:
+                            b.putInt("actionFlag", actionFlag);
+                            b.putString("Num", mContactText.getText().toString());
+                            Toast.makeText(CreateActivity.this, "Call" + actionFlag, Toast.LENGTH_LONG).show();
+                            break;
+                        default:
+                            Toast.makeText(CreateActivity.this, "default", Toast.LENGTH_LONG).show();
+                            break;
+
+                    }
+                    gpsAlarm.putExtras(b);
+                    sendBroadcast(gpsAlarm);
+                }
+                Toast.makeText(CreateActivity.this, distance + "", Toast.LENGTH_LONG).show();
+            }
         }
 
         @Override
@@ -455,7 +449,7 @@ public class CreateActivity extends AppCompatActivity {
     };
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
+    public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putString(TRIGGER_INDEX, mSpinnerTrigger.toString());
@@ -520,7 +514,7 @@ public class CreateActivity extends AppCompatActivity {
 
     public static void saveSharedPreferencesLogList(Context context, ArrayList<Trigger> triggerArrayList) {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor  mEditor = mPrefs.edit();
+        SharedPreferences.Editor mEditor = mPrefs.edit();
         Gson gson = new Gson();
         String json = gson.toJson(triggerArrayList);
         mEditor.putString("TriggerList", json);
@@ -530,15 +524,14 @@ public class CreateActivity extends AppCompatActivity {
     public static ArrayList<Trigger> getSharedPreferencesLogList(Context context) {
         ArrayList<Trigger> triggerArrayList = new ArrayList<>();
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor  mEditor = mPrefs.edit();
+        SharedPreferences.Editor mEditor = mPrefs.edit();
         Gson gson = new Gson();
         String json = mPrefs.getString("TriggerList", "");
-        Type type = new TypeToken<ArrayList<Trigger>>(){}.getType();
-        //catch null lists
-        if(gson.fromJson(json, type)!=null) {
+        Type type = new TypeToken<ArrayList<Trigger>>() {
+        }.getType();
+        if (gson.fromJson(json, type) != null) {
             triggerArrayList = gson.fromJson(json, type);
         }
         return triggerArrayList;
     }
-
 }
