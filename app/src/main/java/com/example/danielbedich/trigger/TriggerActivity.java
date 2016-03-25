@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -46,6 +47,8 @@ public class TriggerActivity extends AppCompatActivity{
             StringArrayAdapter listAdapter = new StringArrayAdapter(triggers, this);
             listView.setAdapter(listAdapter);
         }
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
