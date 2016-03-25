@@ -56,7 +56,8 @@ import java.util.ArrayList;
 
 public class CreateActivity extends AppCompatActivity {
 
-
+    private static int triggerFlag; //1 for time, 2 for gps
+    private static int actionFlag; //1 for reminder, 2, for sms, 3 for call
     private static final String TAG = "CreateActivity";
     private static final String TRIGGER_INDEX = "Time";
     private static final String ACTION_INDEX = "Reminder";
@@ -94,65 +95,25 @@ public class CreateActivity extends AppCompatActivity {
     private LocationManager mLocationManager;
     private LatLng currentCoord;
     private LatLng destination;
+    private int NOTIF_ID=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(CreateActivity.this);
+
+
+        //Initialize fields of view
+        mSpinnerTrigger = (Spinner) findViewById(R.id.trigger_spinner);
+        mSpinnerAction = (Spinner) findViewById(R.id.action_spinner);
+        mContactText = (EditText) findViewById(R.id.contact_name);
+        mMessageText = (EditText) findViewById(R.id.message_text);
         mNameText = (EditText) findViewById(R.id.action_name);
         mGPSLocationText = (EditText) findViewById(R.id.gps_location);
-        mGPSLocationText.setText(getIntent().getStringExtra("mytext"));
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mMessageText = (EditText) findViewById(R.id.message_text);
-        mSpinnerAction = (Spinner) findViewById(R.id.action_spinner);
-
-        actionArray = getResources().getStringArray(R.array.actionArray);
-        ArrayAdapter<String> adapterSpinnerAction  = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_dropdown_item, actionArray);
-
-        mSpinnerAction.setAdapter(adapterSpinnerAction);
-        mSpinnerAction.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (mSpinnerAction.getSelectedItem().toString().equals("Call")) {
-                    mMessageText.setEnabled(false);
-                    mMessageText.setInputType(InputType.TYPE_NULL);
-                    mMessageText.setText(null);
-                    mMessageText.setVisibility(View.GONE);
-                    //mMessageText.setFocusable(false);
-                } else {
-                    mMessageText.setEnabled(true);
-                    mMessageText.setInputType(InputType.TYPE_CLASS_TEXT);
-                    mMessageText.setVisibility(View.VISIBLE);
-                    //mMessageText.setFocusable(true);
-                }
-
-                if (mSpinnerAction.getSelectedItem().toString().equals("Reminder")) {
-                    mContactText.setEnabled(false);
-                    mContactText.setInputType(InputType.TYPE_NULL);
-                    mContactText.setText(null);
-                    mContactText.setVisibility(View.GONE);
-                    //mMessageText.setFocusable(false);
-
-                } else {
-                    mContactText.setEnabled(true);
-                    mContactText.setInputType(InputType.TYPE_CLASS_TEXT);
-                    mContactText.setVisibility(View.VISIBLE);
-                    //mMessageText.setFocusable(true);
-                }
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
         mTimePicker = (TimePicker) findViewById(R.id.timePicker);
-        mSpinnerTrigger = (Spinner) findViewById(R.id.trigger_spinner);
 
+        //Trigger roles and setting visible elements
         triggerArray = getResources().getStringArray(R.array.triggerArray);
         ArrayAdapter<String> adapterSpinnerTrigger  = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_dropdown_item, triggerArray);
@@ -165,7 +126,9 @@ public class CreateActivity extends AppCompatActivity {
                     mTimePicker.setEnabled(true);
                     mTimePicker.setVisibility(View.VISIBLE);
                     mGPSLocationText.setVisibility(View.GONE);
+                    triggerFlag=1;
                 } else {
+                    triggerFlag=2;
                     mTimePicker.setEnabled(false);
                     mTimePicker.setVisibility(View.GONE);
                     mGPSLocationText.setVisibility(View.VISIBLE);
@@ -174,8 +137,8 @@ public class CreateActivity extends AppCompatActivity {
                     mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                     if(PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
                         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, (long) 5, (float) 5, mLocationListener);
-                        Location loc = new Location("285 E 15th Ave Columbus, Ohio");
-                        mLocationListener.onLocationChanged(loc);
+                        //Location loc = new Location("285 E 15th Ave Columbus, Ohio");
+                        //mLocationListener.onLocationChanged(loc);
                     }
 
                 }
@@ -189,6 +152,49 @@ public class CreateActivity extends AppCompatActivity {
         });
 
 
+        //Action roles and setting visible elements
+        actionArray = getResources().getStringArray(R.array.actionArray);
+        ArrayAdapter<String> adapterSpinnerAction  = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_dropdown_item, actionArray);
+
+        mSpinnerAction.setAdapter(adapterSpinnerAction);
+        mSpinnerAction.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (mSpinnerAction.getSelectedItem().toString().equals("Call")) {
+                    mMessageText.setEnabled(false);
+                    mMessageText.setInputType(InputType.TYPE_NULL);
+                    mMessageText.setText(null);
+                    mMessageText.setVisibility(View.GONE);
+                    actionFlag=3;
+                } else {
+                    mMessageText.setEnabled(true);
+                    mMessageText.setInputType(InputType.TYPE_CLASS_TEXT);
+                    mMessageText.setVisibility(View.VISIBLE);
+                }
+
+                if (mSpinnerAction.getSelectedItem().toString().equals("Reminder")) {
+                    mContactText.setEnabled(false);
+                    mContactText.setInputType(InputType.TYPE_NULL);
+                    mContactText.setText(null);
+                    mContactText.setVisibility(View.GONE);
+                    actionFlag=1;
+
+                } else {
+                    mContactText.setEnabled(true);
+                    mContactText.setInputType(InputType.TYPE_CLASS_TEXT);
+                    mContactText.setVisibility(View.VISIBLE);
+                }
+                if (mSpinnerAction.getSelectedItem().toString().equals("SMS")) {
+                    actionFlag=2;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         mButtonSave = (Button) findViewById(R.id.save_button);
         mButtonSave.setOnClickListener(new View.OnClickListener() {
@@ -221,91 +227,124 @@ public class CreateActivity extends AppCompatActivity {
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent cancelAction = new Intent(v.getContext(), TriggerActivity.class);
-                //startActivity(cancelAction);
+                if(triggerFlag==1){
+                    //Timer code
 
+
+                    NOTIF_ID++;
+                    Calendar c = Calendar.getInstance();
+
+                    int hourDiff = (mTimePicker.getCurrentHour()-c.get(Calendar.HOUR_OF_DAY))*60;
+                    Toast.makeText(CreateActivity.this, "hourDiff "+hourDiff, Toast.LENGTH_LONG).show();
+                    if(hourDiff==0){
+                        hourDiff=1;
+                    }
+
+                    int minDiff = (mTimePicker.getCurrentMinute()-c.get(Calendar.MINUTE))*60;
+                    if(minDiff==0){
+                        minDiff=1;
+                    }
+                    Toast.makeText(CreateActivity.this, "minDiff "+minDiff, Toast.LENGTH_LONG).show();
+
+                    Date timeStamp = new Date(c.get(Calendar.YEAR),c.get(Calendar.MONTH),c.get(Calendar.DAY_OF_MONTH),mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
+
+                    Long time =  new GregorianCalendar().getTimeInMillis()+hourDiff*minDiff*1000;
+
+                    Intent intentAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
+                    Bundle b = new Bundle();
+                    switch(actionFlag){
+                        case 1: //reminder
+                            b.putInt("actionFlag", actionFlag);
+                            b.putString("Mes", mMessageText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
+                            break;
+                        case 2: //sms
+                            b.putInt("actionFlag",actionFlag);
+                            b.putString("Num", mContactText.getText().toString());
+                            b.putString("Mes", mMessageText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
+                            break;
+                        case 3:
+                            b.putInt("actionFlag",actionFlag);
+                            b.putString("Num", mContactText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
+                            break;
+                        default:
+                            break;
+
+                    }
+                    intentAlarm.putExtras(b);
+                    AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, time, PendingIntent.getBroadcast(CreateActivity.this, NOTIF_ID, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+                    Toast.makeText(CreateActivity.this, "Alarm Scheduled for "+timeStamp.toString(), Toast.LENGTH_LONG).show();
+                }
+                if(triggerFlag==2) {
+                    //GPS Code
+                    Geocoder geocoder = new Geocoder(getApplicationContext());
+                    List<Address> addresses = null;
+                    double latitude;
+                    double longitude;
+                    float distance = 100000;
+                    Intent gpsAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
+                    try {
+                        addresses = geocoder.getFromLocationName(mGPSLocationText.getText().toString(), 1);
+                    } catch (IOException e) {
+
+                    }
+                    if (addresses.size() > 0) {
+                        latitude = addresses.get(0).getLatitude();
+                        longitude = addresses.get(0).getLongitude();
+                        destination = new LatLng(latitude, longitude);
+                    }
+                    if (destination != null && currentCoord != null) {
+                        Location current = new Location("");
+                        current.setLatitude(currentCoord.latitude);
+                        current.setLongitude(currentCoord.longitude);
+                        Location dest = new Location("");
+                        dest.setLatitude(destination.latitude);
+                        dest.setLongitude(destination.longitude);
+                        distance = current.distanceTo(dest);
+                        if(distance<50){
+                            Toast.makeText(CreateActivity.this, "B"+actionFlag, Toast.LENGTH_LONG).show();
+                            Bundle b = new Bundle();
+                            Toast.makeText(CreateActivity.this, "A"+actionFlag, Toast.LENGTH_LONG).show();
+                            switch(actionFlag){
+                                case 1: //reminder
+                                    b.putInt("actionFlag", actionFlag);
+                                    b.putString("Mes", mMessageText.getText().toString());
+                                    Toast.makeText(CreateActivity.this, "Reminder"+actionFlag, Toast.LENGTH_LONG).show();
+                                    break;
+                                case 2: //sms
+                                    b.putInt("actionFlag",actionFlag);
+                                    b.putString("Num", mContactText.getText().toString());
+                                    b.putString("Mes", mMessageText.getText().toString());
+                                    Toast.makeText(CreateActivity.this, "SMS"+actionFlag, Toast.LENGTH_LONG).show();
+                                    break;
+                                case 3:
+                                    b.putInt("actionFlag",actionFlag);
+                                    b.putString("Num", mContactText.getText().toString());
+                                    Toast.makeText(CreateActivity.this, "Call"+actionFlag, Toast.LENGTH_LONG).show();
+                                    break;
+                                default:
+                                    Toast.makeText(CreateActivity.this, "default", Toast.LENGTH_LONG).show();
+                                    break;
+
+                            }
+                            gpsAlarm.putExtras(b);
+                            sendBroadcast(gpsAlarm);
+                        }
+                        Toast.makeText(CreateActivity.this, distance + "", Toast.LENGTH_LONG).show();
+                    }
+                }
                 /*
-                Geocoder geocoder = new Geocoder(getApplicationContext());
-                List<Address> addresses = null;
-                double latitude;
-                double longitude;
-                try{
-                    addresses = geocoder.getFromLocationName(mGPSLocationText.getText().toString(),1);
-                } catch (IOException e){
 
-                }
-                if(addresses.size()>0){
-                    latitude = addresses.get(0).getLatitude();
-                    longitude = addresses.get(0).getLongitude();
-                    //mMessageText.setText(latitude+"");
-                    //mContactText.setText(longitude+"");
-                    destination = new LatLng(latitude, longitude);
-                }
-                if(destination!=null && currentCoord!=null) {
-                    LatLng diff = new LatLng(destination.latitude - currentCoord.latitude, destination.longitude - currentCoord.longitude);
-                    //Toast.makeText(CreateActivity.this, diff.toString(), Toast.LENGTH_LONG).show();
-                    Location current = new Location("");
-                    current.setLatitude(currentCoord.latitude);
-                    current.setLongitude(currentCoord.longitude);
-                    Location dest = new Location("");
-                    dest.setLatitude(destination.latitude);
-                    dest.setLongitude(destination.longitude);
-                    float distance = current.distanceTo(dest);
-                    Toast.makeText(CreateActivity.this, distance+"", Toast.LENGTH_LONG).show();
-                }
-/*
-                Toast.makeText(CreateActivity.this, "hourDiff "+hourDiff, Toast.LENGTH_LONG).show();
-
-                int minDiff = (mTimePicker.getCurrentMinute()-c.get(Calendar.MINUTE))*60;
-                if(minDiff==0){
-                    minDiff=1;
-                }
-                Toast.makeText(CreateActivity.this, "minDiff "+minDiff, Toast.LENGTH_LONG).show();
-
-
-                Long time2 =  new GregorianCalendar().getTimeInMillis()+hourDiff*minDiff*1000;
-
-                Intent intentAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
-                Bundle b = new Bundle();
-                b.putString("Num", mContactText.getText().toString());
-                b.putString("Mes", mMessageText.getText().toString());
-                intentAlarm.putExtras(b);
-                AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-
-                alarmManager.set(AlarmManager.RTC_WAKEUP, time2, PendingIntent.getBroadcast(CreateActivity.this, 1, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
-                Toast.makeText(CreateActivity.this, "Alarm Scheduled for "+timeStamp.toString(), Toast.LENGTH_LONG).show();
-
+                */
                 //create an AlarmManager for scenario of picking time
                 /*Intent timeIntent = new Intent(CreateActivity.this, TriggerExecution.class);
                 PendingIntent pendTimeIntent = PendingIntent.getService(CreateActivity.this, 1, timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                AlarmManager alarmMan = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(System.currentTimeMillis());
-                cal.add(Calendar.SECOND, 10);
 
-                 cal.add(Calendar.HOUR_OF_DAY, mTimePicker.getCurrentHour());
-                 cal.add(Calendar.MINUTE, mTimePicker.getCurrentMinute());
-                 cal.add(Calendar.SECOND, 0);
-                 cal.add(Calendar.MILLISECOND, 0);
-
-                alarmMan.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendTimeIntent);*/
-
-                alarmMan.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendTimeIntent);
-
-
-                NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(v.getContext());
-                notifBuilder.setSmallIcon(R.drawable.common_google_signin_btn_icon_dark);
-                notifBuilder.setContentTitle("Trigger");
-                notifBuilder.setTicker("New Trigger!");
-                notifBuilder.setContentText(mMessageText.getText().toString());
-
-                long[] vibrateTime = {2000};
-                notifBuilder.setVibrate(vibrateTime);
-                Intent resultIntent = new Intent(CreateActivity.this, TriggerActivity.class);
-                PendingIntent resultPendingIntent = PendingIntent.getActivity(CreateActivity.this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                notifBuilder.setContentIntent(resultPendingIntent);
-                mNotificationManager.notify(1, notifBuilder.build());
 
                 //Call the specified number
                 Intent call = new Intent(Intent.ACTION_CALL);
@@ -323,7 +362,7 @@ public class CreateActivity extends AppCompatActivity {
             }
         });
 
-        mContactText = (EditText) findViewById(R.id.contact_name);
+
         mContactText.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
