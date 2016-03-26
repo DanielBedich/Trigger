@@ -38,7 +38,7 @@ public class Trigger {
     }
 
     public void setActionType(String aType) {
-        this.triggerType = aType;
+        this.actionType = aType;
     }
 
     public String getContactNumber() {

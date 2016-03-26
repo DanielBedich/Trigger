@@ -104,7 +104,8 @@ public class CreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(CreateActivity.this);
-
+        position = this.getIntent().getIntExtra("trigger2", -1);
+        triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
 
         //Initialize fields of view
         mSpinnerTrigger = (Spinner) findViewById(R.id.trigger_spinner);
@@ -114,14 +115,15 @@ public class CreateActivity extends AppCompatActivity {
         mNameText = (EditText) findViewById(R.id.action_name);
         mGPSLocationText = (EditText) findViewById(R.id.gps_location);
         mTimePicker = (TimePicker) findViewById(R.id.timePicker);
-        position = this.getIntent().getIntExtra("trigger2", -1);
-        triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
+
         //Trigger roles and setting visible elements
         triggerArray = getResources().getStringArray(R.array.triggerArray);
         ArrayAdapter<String> adapterSpinnerTrigger = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_dropdown_item, triggerArray);
 
         mSpinnerTrigger.setAdapter(adapterSpinnerTrigger);
+        if(position>=0)
+            mSpinnerTrigger.setSelection(adapterSpinnerTrigger.getPosition(triggerArrayList.get(position).getTriggerType()));
         mSpinnerTrigger.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
