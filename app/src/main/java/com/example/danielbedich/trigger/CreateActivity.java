@@ -116,11 +116,16 @@ public class CreateActivity extends AppCompatActivity {
         mGPSLocationText = (EditText) findViewById(R.id.gps_location);
         mTimePicker = (TimePicker) findViewById(R.id.timePicker);
 
+        if(position>=0) {
+            mNameText.setText(triggerArrayList.get(position).getActionName());
+            mMessageText.setText(triggerArrayList.get(position).getMessage());
+            mContactText.setText(triggerArrayList.get(position).getContactNumber());
+            mGPSLocationText.setText(triggerArrayList.get(position).getGPS());
+        }
         //Trigger roles and setting visible elements
         triggerArray = getResources().getStringArray(R.array.triggerArray);
         ArrayAdapter<String> adapterSpinnerTrigger = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_dropdown_item, triggerArray);
-
         mSpinnerTrigger.setAdapter(adapterSpinnerTrigger);
         if(position>=0)
             mSpinnerTrigger.setSelection(adapterSpinnerTrigger.getPosition(triggerArrayList.get(position).getTriggerType()));
@@ -157,12 +162,15 @@ public class CreateActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_dropdown_item, actionArray);
 
         mSpinnerAction.setAdapter(adapterSpinnerAction);
+        if(position>=0)
+            mSpinnerAction.setSelection(adapterSpinnerAction.getPosition(triggerArrayList.get(position).getActionType()));
         mSpinnerAction.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (mSpinnerAction.getSelectedItem().toString().equals("Call")) {
                     mMessageText.setEnabled(false);
                     mMessageText.setInputType(InputType.TYPE_NULL);
+                    mMessageText.setText(null);
                     mMessageText.setText(null);
                     mMessageText.setVisibility(View.GONE);
                     actionFlag = 3;
