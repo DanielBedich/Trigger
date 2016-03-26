@@ -52,7 +52,7 @@ public class TriggerActivity extends AppCompatActivity implements AdapterView.On
             listView.setOnItemClickListener(this);
         }
 
-
+Log.d("TAGF", ""+triggers);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
