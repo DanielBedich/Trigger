@@ -230,7 +230,6 @@ public class CreateActivity extends AppCompatActivity {
                     triggerArrayList.get(position).setActionName(actionName.getText().toString());
                     triggerArrayList.get(position).setTime(timePicker.getCurrentHour(), timePicker.getCurrentMinute());
                     triggerArrayList.get(position).setGPS(mGPSLocationText.getText().toString());
-                    currentTrigger = triggerArrayList.get(position);
                     triggers = getSharedStringPreferencesLogList(CreateActivity.this);
                     triggers.set(position, actionName.getText().toString());
                     saveSharedStringPreferencesLogList(CreateActivity.this, triggers);
@@ -304,9 +303,7 @@ public class CreateActivity extends AppCompatActivity {
                     //gpsFlag = true;
                 }
 
-                if(position ==-1) {
-                triggerArrayList.add(currentTrigger);
-                }
+
                 //used this to make sure my trigger class was extracting all the information in the class
                 saveSharedPreferencesLogList(CreateActivity.this, triggerArrayList);
                 Intent saveAction = new Intent(v.getContext(), TriggerActivity.class);
