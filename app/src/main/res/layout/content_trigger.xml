@@ -24,10 +24,5 @@
             android:layout_height="wrap_content"
             android:text="@string/new_button" />
 
-        <Button
-            android:id="@+id/delete_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/delete_button" />
     </LinearLayout>
 </LinearLayout>

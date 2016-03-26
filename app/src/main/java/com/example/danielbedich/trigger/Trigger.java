@@ -12,8 +12,9 @@ public class Trigger {
     private String message;
     private int timeHour;
     private int timeMinute;
+    private String gps;
 
-    public Trigger(String tType, String aType, String contact, String message, String name, int timeHour, int timeMinute){
+    public Trigger(String tType, String aType, String contact, String message, String name, int timeHour, int timeMinute, String gps){
         this.triggerType = tType;
         this.actionType = aType;
         this.contactNumber = contact;
@@ -21,13 +22,14 @@ public class Trigger {
         this.actionName = name;
         this.timeHour = timeMinute;
         this.timeMinute = timeMinute;
+        this.gps = gps;
     }
 
     public String getTriggerType() {
         return triggerType;
     }
 
-    public void TriggerType(String tType) {
+    public void setTriggerType(String tType) {
         this.triggerType = tType;
     }
 
@@ -35,7 +37,7 @@ public class Trigger {
         return actionType;
     }
 
-    public void ActionType(String aType) {
+    public void setActionType(String aType) {
         this.triggerType = aType;
     }
 
@@ -74,6 +76,14 @@ public class Trigger {
     public void setTime(int timeHour, int timeMinute) {
         this.timeHour = timeHour;
         this.timeMinute = timeMinute;
+    }
+
+    public String getGPS() {
+        return gps;
+    }
+
+    public void setGPS(String gps) {
+        this.gps = gps;
     }
 
 }

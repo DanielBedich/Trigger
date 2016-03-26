@@ -87,7 +87,7 @@ public class CreateActivity extends AppCompatActivity {
     private Trigger currentTrigger;
     private EditText mGPSLocationText;
     private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
-    private ArrayList<Trigger> triggerArrayListTemp = new ArrayList<>();
+    private ArrayList<String> triggers = new ArrayList<>();
     private String[] triggerArray;
     private String[] actionArray;
     private EditText mNameText;
@@ -95,6 +95,7 @@ public class CreateActivity extends AppCompatActivity {
     private LocationManager mLocationManager;
     private LatLng currentCoord;
     private LatLng destination;
+    private int position;
     private int NOTIF_ID = 0;
     //private boolean gpsFlag = true;
 
@@ -113,7 +114,8 @@ public class CreateActivity extends AppCompatActivity {
         mNameText = (EditText) findViewById(R.id.action_name);
         mGPSLocationText = (EditText) findViewById(R.id.gps_location);
         mTimePicker = (TimePicker) findViewById(R.id.timePicker);
-
+        position = this.getIntent().getIntExtra("trigger2", -1);
+        triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
         //Trigger roles and setting visible elements
         triggerArray = getResources().getStringArray(R.array.triggerArray);
         ArrayAdapter<String> adapterSpinnerTrigger = new ArrayAdapter<String>(this,
@@ -201,13 +203,27 @@ public class CreateActivity extends AppCompatActivity {
                 message = (EditText) findViewById(R.id.message_text);
                 actionName = (EditText) findViewById(R.id.action_name);
                 timePicker = (TimePicker) findViewById(R.id.timePicker);
-                currentTrigger = new Trigger(triggerSpinner.getSelectedItem().toString(),
-                        actionSpinner.getSelectedItem().toString(),
-                        contactNumber.getText().toString(), message.getText().toString(),
-                        actionName.getText().toString(), timePicker.getCurrentHour(),
-                        timePicker.getCurrentMinute());
-
-                triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
+                if(position==-1){
+                    currentTrigger = new Trigger(triggerSpinner.getSelectedItem().toString(),
+                            actionSpinner.getSelectedItem().toString(),
+                            contactNumber.getText().toString(), message.getText().toString(),
+                            actionName.getText().toString(), timePicker.getCurrentHour(),
+                            timePicker.getCurrentMinute(), mGPSLocationText.getText().toString());
+                    triggerArrayList.add(currentTrigger);
+                } else{
+                    triggerArrayList.get(position).setTriggerType(triggerSpinner.getSelectedItem().toString());
+                    triggerArrayList.get(position).setActionType(actionSpinner.getSelectedItem().toString());
+                    triggerArrayList.get(position).setContact(contactNumber.getText().toString());
+                    triggerArrayList.get(position).setMessage(message.getText().toString());
+                    triggerArrayList.get(position).setActionName(actionName.getText().toString());
+                    triggerArrayList.get(position).setTime(timePicker.getCurrentHour(),
+                            timePicker.getCurrentMinute());
+                    triggerArrayList.get(position).setGPS(mGPSLocationText.getText().toString());
+                    currentTrigger = triggerArrayList.get(position);
+                    triggers = getSharedStringPreferencesLogList(CreateActivity.this);
+                    triggers.set(position, actionName.getText().toString());
+                    saveSharedStringPreferencesLogList(CreateActivity.this, triggers);
+                }
 
 
 
@@ -283,7 +299,9 @@ public class CreateActivity extends AppCompatActivity {
                 //used this to make sure my trigger class was extracting all the information in the class
                 saveSharedPreferencesLogList(CreateActivity.this, triggerArrayList);
                 Intent saveAction = new Intent(v.getContext(), TriggerActivity.class);
-                saveAction.putExtra("actionName", currentTrigger.getActionName());
+                if(position ==-1) {
+                    saveAction.putExtra("actionName", currentTrigger.getActionName());
+                }
                 startActivity(saveAction);
             }
         });
@@ -533,5 +551,28 @@ public class CreateActivity extends AppCompatActivity {
             triggerArrayList = gson.fromJson(json, type);
         }
         return triggerArrayList;
+    }
+
+    public static void saveSharedStringPreferencesLogList(Context context, ArrayList<String> triggers){
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor  mEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(triggers);
+        mEditor.putString("Triggers", json);
+        mEditor.commit();
+    }
+
+    public static ArrayList<String> getSharedStringPreferencesLogList(Context context) {
+        ArrayList<String> triggers = new ArrayList<>();
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor  mEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = mPrefs.getString("Triggers", "");
+        Type type = new TypeToken<ArrayList<String>>(){}.getType();
+        //catch null lists
+        if(gson.fromJson(json, type)!=null) {
+            triggers = gson.fromJson(json, type);
+        }
+        return triggers;
     }
 }

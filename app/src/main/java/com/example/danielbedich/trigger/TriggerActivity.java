@@ -14,8 +14,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -23,7 +26,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class TriggerActivity extends AppCompatActivity{
+public class TriggerActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
 
     private Button mButtonNew;
     private ArrayList<String> triggers = new ArrayList<>();
@@ -40,12 +43,13 @@ public class TriggerActivity extends AppCompatActivity{
         if(this.getIntent().getStringExtra("actionName") !=null) {
             triggers.add(this.getIntent().getStringExtra("actionName"));
         }
-        if(triggers != null) {
-            saveSharedPreferencesLogList(TriggerActivity.this, triggers);
-            Log.d("actionName", "onClick: " + triggers.toString());
+
+        saveSharedPreferencesLogList(TriggerActivity.this, triggers);
+        if(!triggers.isEmpty()) {
             ListView listView = (ListView) findViewById(R.id.triggerlist);
-            StringArrayAdapter listAdapter = new StringArrayAdapter(triggers, this);
+            ListAdapter listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, triggers);
             listView.setAdapter(listAdapter);
+            listView.setOnItemClickListener(this);
         }
 
 
@@ -97,6 +101,14 @@ public class TriggerActivity extends AppCompatActivity{
             triggers = gson.fromJson(json, type);
         }
         return triggers;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+        //write your code here that will start a new intent, something like:
+        Intent detailAction = new Intent(v.getContext(), DetailsActivity.class);
+        detailAction.putExtra("trigger", position);
+        startActivity(detailAction);
     }
 
 }

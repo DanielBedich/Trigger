@@ -23,35 +23,35 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_margin="10dp"
-            android:text="Name:"
+            android:id="@+id/name"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_margin="10dp"
-            android:text="Trigger:"
+            android:id="@+id/trigger"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_margin="10dp"
-            android:text="Action:"
+            android:id="@+id/action"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_margin="10dp"
-            android:text="Contact:"
+            android:id="@+id/contact"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_margin="10dp"
-            android:text="Message:"
+            android:id="@+id/message"
             />
     </LinearLayout>
     <LinearLayout
@@ -68,8 +68,8 @@
         android:layout_height="wrap_content"
         android:text="@string/back_button"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/edit_button"
-        android:layout_toEndOf="@+id/edit_button" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <Button
         android:id="@+id/edit_button"
@@ -77,6 +77,15 @@
         android:layout_height="wrap_content"
         android:text="@string/edit_button"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/linearLayout2"
-        android:layout_toEndOf="@+id/linearLayout2" />
+        android:layout_toRightOf="@+id/linearLayout"
+        android:layout_toEndOf="@+id/linearLayout" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DELETE"
+        android:id="@+id/delete_button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
