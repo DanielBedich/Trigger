@@ -74,6 +74,7 @@ Log.d("TAGF", ""+triggers);
                                 startActivity(saveAction);
                             }
                         });
+                builder.setTitle("Activate a new Trigger");
                 builder.show();
             }
 

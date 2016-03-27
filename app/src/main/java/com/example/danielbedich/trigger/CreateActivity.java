@@ -240,9 +240,7 @@ public class CreateActivity extends AppCompatActivity {
                 //setup to get current location
                 mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                 if (PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, (long) 5, (float) 5, mLocationListener);
-                    //Location loc = new Location("285 E 15th Ave Columbus, Ohio");
-                    //mLocationListener.onLocationChanged(loc);
+                    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, (long) 15, (float) 20, mLocationListener);
                 }
 
                 if (triggerFlag == 1) {

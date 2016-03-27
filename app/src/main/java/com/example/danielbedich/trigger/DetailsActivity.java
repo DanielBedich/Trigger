@@ -49,6 +49,7 @@ public class DetailsActivity extends AppCompatActivity {
         actionDetails.setText("Action: " + triggerArrayList.get(position).getActionType());
         contactDetails.setText("Contact: " + triggerArrayList.get(position).getContactNumber());
         messageDetails.setText("Message: " + triggerArrayList.get(position).getMessage());
+        
 
 
         mButtonBack = (Button) findViewById(R.id.back_button);
