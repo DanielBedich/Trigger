@@ -20,7 +20,7 @@ public class Trigger {
         this.contactNumber = contact;
         this.message = message;
         this.actionName = name;
-        this.timeHour = timeMinute;
+        this.timeHour = timeHour;
         this.timeMinute = timeMinute;
         this.gps = gps;
     }

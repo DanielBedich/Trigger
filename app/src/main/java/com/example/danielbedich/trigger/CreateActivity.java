@@ -123,6 +123,8 @@ public class CreateActivity extends AppCompatActivity {
             mMessageText.setText(triggerArrayList.get(position).getMessage());
             mContactText.setText(triggerArrayList.get(position).getContactNumber());
             mGPSLocationText.setText(triggerArrayList.get(position).getGPS());
+            mTimePicker.setCurrentHour(triggerArrayList.get(position).getTimeHour());
+            mTimePicker.setCurrentMinute(triggerArrayList.get(position).getTimeMinute());
         }
 
         //Trigger roles and setting visible elements
@@ -224,7 +226,7 @@ public class CreateActivity extends AppCompatActivity {
                             actionName.getText().toString(), timePicker.getCurrentHour(),
                             timePicker.getCurrentMinute(), mGPSLocationText.getText().toString());
                     triggerArrayList.add(currentTrigger);
-                } else{
+                } else {
                     triggerArrayList.get(position).setTriggerType(triggerSpinner.getSelectedItem().toString());
                     triggerArrayList.get(position).setActionType(actionSpinner.getSelectedItem().toString());
                     triggerArrayList.get(position).setContact(contactNumber.getText().toString());
