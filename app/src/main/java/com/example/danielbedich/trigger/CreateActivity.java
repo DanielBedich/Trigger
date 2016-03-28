@@ -111,7 +111,10 @@ public class CreateActivity extends AppCompatActivity {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(CreateActivity.this);
         position = this.getIntent().getIntExtra("trigger2", -1);
         triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
-
+        if(triggerArrayList.size()>0&&position==-1)
+            NOTIF_ID = triggerArrayList.get(triggerArrayList.size()-1).getID()+1;
+        else if(position>=0)
+            NOTIF_ID = triggerArrayList.get(position).getID();
 
         //Initialize fields of view
         mSpinnerTrigger = (Spinner) findViewById(R.id.trigger_spinner);
@@ -132,7 +135,6 @@ public class CreateActivity extends AppCompatActivity {
         }
 
         //setup to get current location
-
 
         //Trigger roles and setting visible elements
         triggerArray = getResources().getStringArray(R.array.triggerArray);
@@ -267,7 +269,7 @@ public class CreateActivity extends AppCompatActivity {
                             actionSpinner.getSelectedItem().toString(),
                             contactNumber.getText().toString(), message.getText().toString(),
                             actionName.getText().toString(), timePicker.getCurrentHour(),
-                            timePicker.getCurrentMinute(), mGPSLocationText.getText().toString());
+                            timePicker.getCurrentMinute(), mGPSLocationText.getText().toString(), NOTIF_ID);
                     triggerArrayList.add(currentTrigger);
                 } else {
                     triggerArrayList.get(position).setTriggerType(triggerSpinner.getSelectedItem().toString());
@@ -280,6 +282,12 @@ public class CreateActivity extends AppCompatActivity {
                     triggers = getSharedStringPreferencesLogList(CreateActivity.this);
                     triggers.set(position, actionName.getText().toString());
                     saveSharedStringPreferencesLogList(CreateActivity.this, triggers);
+                }
+                Log.d("Notif_ID", ""+NOTIF_ID);
+                //setup to get current location
+                mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                if (PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, (long) 15, (float) 20, mLocationListener);
                 }
 
                 if (triggerFlag == 1) {
@@ -325,15 +333,15 @@ public class CreateActivity extends AppCompatActivity {
                     }
                     intentAlarm.putExtras(b);
                     AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
+                    if(position>=0) {
+                        alarmManager.cancel(PendingIntent.getBroadcast(CreateActivity.this, NOTIF_ID, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+                    }
                     alarmManager.set(AlarmManager.RTC_WAKEUP, time, PendingIntent.getBroadcast(CreateActivity.this, NOTIF_ID, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
                     Toast.makeText(CreateActivity.this, "Alarm Scheduled for " + timeStamp.toString(), Toast.LENGTH_LONG).show();
                 }
                 if (triggerFlag == 2) {
                     PROX_ID++;
-                    //Intent intentGpsAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
-                    //Intent intent = new Intent()
-                    String intentAction = "PROXIMITY_ALERT." + PROX_ID;
+                    Intent intentAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
                     Bundle b = new Bundle();
                     switch (actionFlag) {
                         case 1: //reminder
@@ -379,9 +387,7 @@ public class CreateActivity extends AppCompatActivity {
                             destination = new LatLng(latitude, longitude);
                         }
                         mLocationManager.addProximityAlert(destination.latitude, destination.longitude, 50, -1, proximityIntent);
-
                     }
-
                 }else if(triggerFlag == 3){
 
                 }
