@@ -1,6 +1,7 @@
 package com.example.danielbedich.trigger;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -17,8 +18,10 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -28,16 +31,22 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.app.TimePickerDialog;
 
 import java.io.IOException;
+import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -48,6 +57,8 @@ import java.util.ArrayList;
 public class CreateActivity extends AppCompatActivity {
 
     private static int triggerFlag; //1 for time, 2 for gps
+    private static boolean arrivalFlag = false;
+    private static boolean departureFlag = false;
     private static int actionFlag; //1 for reminder, 2, for sms, 3 for call
     private static final String TAG = "CreateActivity";
     private static final String TRIGGER_INDEX = "Time";
@@ -61,6 +72,7 @@ public class CreateActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = null;
     private Button mButtonSave;
     private Button mButtonCancel;
+    private Button mButtonMapView;
     private EditText mContactText;
     private EditText mMessageText;
     private String contactID;
@@ -88,8 +100,8 @@ public class CreateActivity extends AppCompatActivity {
     private LatLng destination;
     private int position;
     private int NOTIF_ID = 0;
+    private int PROX_ID = 0;
     private boolean gpsFlag = true;
-    private boolean delete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +109,6 @@ public class CreateActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(CreateActivity.this);
         position = this.getIntent().getIntExtra("trigger2", -1);
-        delete = this.getIntent().getBooleanExtra("delete", false);
-        Log.d("Boolean", ""+delete);
         triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
         if(triggerArrayList.size()>0&&position==-1)
             NOTIF_ID = triggerArrayList.get(triggerArrayList.size()-1).getID()+1;
@@ -123,6 +133,12 @@ public class CreateActivity extends AppCompatActivity {
             mTimePicker.setCurrentMinute(triggerArrayList.get(position).getTimeMinute());
         }
 
+        //setup to get current location
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, (long) 15, (float) 20, mLocationListener);
+        }
+
         //Trigger roles and setting visible elements
         triggerArray = getResources().getStringArray(R.array.triggerArray);
         ArrayAdapter<String> adapterSpinnerTrigger = new ArrayAdapter<String>(this,
@@ -137,16 +153,20 @@ public class CreateActivity extends AppCompatActivity {
                     mTimePicker.setEnabled(true);
                     mTimePicker.setVisibility(View.VISIBLE);
                     mGPSLocationText.setVisibility(View.GONE);
+                    mButtonMapView.setVisibility((View.GONE));
                     triggerFlag = 1;
                 } else if(mSpinnerTrigger.getSelectedItem().toString().equals("GPS Arrival")){
                     triggerFlag = 2;
                     mTimePicker.setEnabled(false);
                     mTimePicker.setVisibility(View.GONE);
+                    mButtonMapView.setVisibility(View.VISIBLE);
                     mGPSLocationText.setVisibility(View.VISIBLE);
+
                 }else{
                     triggerFlag = 3;
                     mTimePicker.setEnabled(false);
                     mTimePicker.setVisibility(View.GONE);
+                    mButtonMapView.setVisibility(View.VISIBLE);
                     mGPSLocationText.setVisibility(View.VISIBLE);
                 }
 
@@ -205,6 +225,38 @@ public class CreateActivity extends AppCompatActivity {
             }
         });
 
+        mButtonMapView = (Button) findViewById(R.id.map_view);
+        mButtonMapView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Address> addresses = null;
+                Geocoder geocoder = new Geocoder(getApplicationContext());
+                Double latitude, longitude;
+                try {
+                    addresses = geocoder.getFromLocationName(mGPSLocationText.getText().toString(), 1);
+
+                } catch (IOException e) {
+
+                }
+                if (addresses.size() > 0) {
+                    latitude = addresses.get(0).getLatitude();
+                    longitude = addresses.get(0).getLongitude();
+                    destination = new LatLng(latitude, longitude);
+                }
+                Bundle b = new Bundle();
+                if (destination != null) {
+                    b.putDouble("destLong", destination.longitude);
+                    b.putDouble("destLat", destination.latitude);
+                }
+                //b.putDouble("currentLat", currentCoord.latitude);
+                //b.putDouble("currentLong", currentCoord.longitude);
+                b.putInt("triggerFlag", triggerFlag);
+                Intent mapIntent = new Intent(CreateActivity.this, MapsActivity.class);
+                mapIntent.putExtras(b);
+                startActivity(mapIntent);
+            }
+        });
+
         mButtonSave = (Button) findViewById(R.id.save_button);
         mButtonSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -243,6 +295,7 @@ public class CreateActivity extends AppCompatActivity {
 
                 if (triggerFlag == 1) {
                     //Timer code
+                    NOTIF_ID++;
                     Calendar c = Calendar.getInstance();
                     int hourDiff = (mTimePicker.getCurrentHour() - c.get(Calendar.HOUR_OF_DAY)) * 60;
                     //Toast.makeText(CreateActivity.this, "hourDiff " + hourDiff, Toast.LENGTH_LONG).show();
@@ -264,15 +317,18 @@ public class CreateActivity extends AppCompatActivity {
                         case 1: //reminder
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Mes", mMessageText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
                             break;
                         case 2: //sms
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
                             b.putString("Mes", mMessageText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
                             break;
                         case 3:
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
                             break;
                         default:
                             break;
@@ -287,7 +343,50 @@ public class CreateActivity extends AppCompatActivity {
                     Toast.makeText(CreateActivity.this, "Alarm Scheduled for " + timeStamp.toString(), Toast.LENGTH_LONG).show();
                 }
                 if (triggerFlag == 2) {
-                    //GPS Code
+                    PROX_ID++;
+                    Intent intentAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
+                    Bundle b = new Bundle();
+                    switch (actionFlag) {
+                        case 1: //reminder
+                            b.putInt("actionFlag", actionFlag);
+                            b.putString("Mes", mMessageText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
+                            break;
+                        case 2: //sms
+                            b.putInt("actionFlag", actionFlag);
+                            b.putString("Num", mContactText.getText().toString());
+                            b.putString("Mes", mMessageText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
+                            break;
+                        case 3:
+                            b.putInt("actionFlag", actionFlag);
+                            b.putString("Num", mContactText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
+                            break;
+                        default:
+                            break;
+
+                    }
+                    intentAlarm.putExtras(b);
+                    PendingIntent proximityIntent = PendingIntent.getBroadcast(CreateActivity.this, PROX_ID, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
+                    if(PackageManager.PERMISSION_GRANTED == v.getContext().checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
+                        Geocoder geocoder = new Geocoder(getApplicationContext());
+                        List<Address> addresses = null;
+                        double latitude, longitude;
+                        try {
+                            addresses = geocoder.getFromLocationName(mGPSLocationText.getText().toString(), 1);
+                        } catch (IOException e) {
+
+                        }
+                        if (addresses.size() > 0) {
+                            latitude = addresses.get(0).getLatitude();
+                            longitude = addresses.get(0).getLongitude();
+                            destination = new LatLng(latitude, longitude);
+                        }
+                        mLocationManager.addProximityAlert(destination.latitude, destination.longitude, 50, -1, proximityIntent);
+                    }
+                }else if(triggerFlag == 3){
+
                 }
 
                 //used this to make sure my trigger class was extracting all the information in the class
@@ -397,6 +496,7 @@ public class CreateActivity extends AppCompatActivity {
             } catch (IOException e) {
 
             }
+            /*
             if (addresses.size() > 0) {
                 latitude = addresses.get(0).getLatitude();
                 longitude = addresses.get(0).getLongitude();
@@ -411,7 +511,7 @@ public class CreateActivity extends AppCompatActivity {
                 dest.setLongitude(destination.longitude);
                 distance = current.distanceTo(dest);
                 //Toast.makeText(CreateActivity.this, distance+"", Toast.LENGTH_SHORT).show();
-                if (triggerFlag == 2 && distance < 50) {
+                if (arrivalFlag && distance < 50) {
                     gpsFlag = false;
                     Bundle b = new Bundle();
                     switch (actionFlag) {
@@ -434,7 +534,7 @@ public class CreateActivity extends AppCompatActivity {
                     }
                     gpsAlarm.putExtras(b);
                     sendBroadcast(gpsAlarm);
-                }else if(triggerFlag == 3 && distance > 100){
+                }else if(departureFlag && distance > 100){
                     gpsFlag = false;
                     Bundle b = new Bundle();
                     switch (actionFlag) {
@@ -460,6 +560,7 @@ public class CreateActivity extends AppCompatActivity {
                 }
                 //Toast.makeText(CreateActivity.this, distance + "", Toast.LENGTH_LONG).show();
             }
+            */
         }
 
         @Override
