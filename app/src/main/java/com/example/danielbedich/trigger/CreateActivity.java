@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -110,9 +111,8 @@ public class CreateActivity extends AppCompatActivity {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(CreateActivity.this);
         position = this.getIntent().getIntExtra("trigger2", -1);
         triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
-        for(Trigger object: triggerArrayList){
-            Log.d("tago",""+object.getActionName());
-        }
+
+
         //Initialize fields of view
         mSpinnerTrigger = (Spinner) findViewById(R.id.trigger_spinner);
         mSpinnerAction = (Spinner) findViewById(R.id.action_spinner);
@@ -132,10 +132,7 @@ public class CreateActivity extends AppCompatActivity {
         }
 
         //setup to get current location
-        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, (long) 15, (float) 20, mLocationListener);
-        }
+
 
         //Trigger roles and setting visible elements
         triggerArray = getResources().getStringArray(R.array.triggerArray);
@@ -334,31 +331,39 @@ public class CreateActivity extends AppCompatActivity {
                 }
                 if (triggerFlag == 2) {
                     PROX_ID++;
-                    Intent intentAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
+                    //Intent intentGpsAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
+                    //Intent intent = new Intent()
+                    String intentAction = "PROXIMITY_ALERT." + PROX_ID;
                     Bundle b = new Bundle();
                     switch (actionFlag) {
                         case 1: //reminder
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Mes", mMessageText.getText().toString());
-                            b.putInt("id", NOTIF_ID);
+                            b.putInt("id", PROX_ID);
                             break;
                         case 2: //sms
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
                             b.putString("Mes", mMessageText.getText().toString());
-                            b.putInt("id", NOTIF_ID);
+                            b.putInt("id", PROX_ID);
                             break;
                         case 3:
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
-                            b.putInt("id", NOTIF_ID);
+                            b.putInt("id", PROX_ID);
                             break;
                         default:
                             break;
 
                     }
-                    intentAlarm.putExtras(b);
-                    PendingIntent proximityIntent = PendingIntent.getBroadcast(CreateActivity.this, PROX_ID, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
+                    //intentGpsAlarm.putExtras(b);
+                    IntentFilter filter = new IntentFilter();
+                    registerReceiver(new TriggerExecution(), filter);
+                    mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                    if (PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, (long) 15, (float) 20, mLocationListener);
+                    }
+                    PendingIntent proximityIntent = PendingIntent.getBroadcast(CreateActivity.this, PROX_ID, new Intent(intentAction), PendingIntent.FLAG_CANCEL_CURRENT);
                     if(PackageManager.PERMISSION_GRANTED == v.getContext().checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
                         Geocoder geocoder = new Geocoder(getApplicationContext());
                         List<Address> addresses = null;
@@ -374,7 +379,9 @@ public class CreateActivity extends AppCompatActivity {
                             destination = new LatLng(latitude, longitude);
                         }
                         mLocationManager.addProximityAlert(destination.latitude, destination.longitude, 50, -1, proximityIntent);
+
                     }
+
                 }else if(triggerFlag == 3){
 
                 }
