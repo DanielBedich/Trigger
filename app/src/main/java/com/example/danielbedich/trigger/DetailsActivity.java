@@ -115,15 +115,18 @@ public class DetailsActivity extends AppCompatActivity {
             case 1: //reminder
                 b.putInt("actionFlag", actionFlag);
                 b.putString("Mes", triggerArrayList.get(position).getMessage());
+                b.putInt("id", NOTIF_ID);
                 break;
             case 2: //sms
                 b.putInt("actionFlag", actionFlag);
                 b.putString("Num", triggerArrayList.get(position).getContactNumber());
                 b.putString("Mes", triggerArrayList.get(position).getMessage());
+                b.putInt("id", NOTIF_ID);
                 break;
             case 3:
                 b.putInt("actionFlag", actionFlag);
                 b.putString("Num", triggerArrayList.get(position).getContactNumber());
+                b.putInt("id", NOTIF_ID);
                 break;
             default:
                 break;

@@ -292,7 +292,6 @@ public class CreateActivity extends AppCompatActivity {
 
                 if (triggerFlag == 1) {
                     //Timer code
-                    NOTIF_ID++;
                     Calendar c = Calendar.getInstance();
                     int hourDiff = (mTimePicker.getCurrentHour() - c.get(Calendar.HOUR_OF_DAY)) * 60;
                     //Toast.makeText(CreateActivity.this, "hourDiff " + hourDiff, Toast.LENGTH_LONG).show();
