@@ -248,7 +248,7 @@ public class CreateActivity extends AppCompatActivity {
                     NOTIF_ID++;
                     Calendar c = Calendar.getInstance();
                     int hourDiff = (mTimePicker.getCurrentHour() - c.get(Calendar.HOUR_OF_DAY)) * 60;
-                    Toast.makeText(CreateActivity.this, "hourDiff " + hourDiff, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(CreateActivity.this, "hourDiff " + hourDiff, Toast.LENGTH_LONG).show();
                     if (hourDiff == 0) {
                         hourDiff = 1;
                     }
@@ -256,7 +256,7 @@ public class CreateActivity extends AppCompatActivity {
                     if (minDiff == 0) {
                         minDiff = 1;
                     }
-                    Toast.makeText(CreateActivity.this, "minDiff " + minDiff, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(CreateActivity.this, "minDiff " + minDiff, Toast.LENGTH_LONG).show();
 
                     Date timeStamp = new Date(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
                     Long time = new GregorianCalendar().getTimeInMillis() + hourDiff * minDiff * 1000;
@@ -413,13 +413,10 @@ public class CreateActivity extends AppCompatActivity {
                 dest.setLatitude(destination.latitude);
                 dest.setLongitude(destination.longitude);
                 distance = current.distanceTo(dest);
-                Toast.makeText(CreateActivity.this, distance+"", Toast.LENGTH_SHORT).show();
-                Toast.makeText(CreateActivity.this, "Trigger flag: " + triggerFlag, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(CreateActivity.this, distance+"", Toast.LENGTH_SHORT).show();
                 if (triggerFlag == 2 && distance < 50) {
                     gpsFlag = false;
-                    Toast.makeText(CreateActivity.this, "B" + actionFlag, Toast.LENGTH_LONG).show();
                     Bundle b = new Bundle();
-                    Toast.makeText(CreateActivity.this, "A" + actionFlag, Toast.LENGTH_LONG).show();
                     switch (actionFlag) {
                         case 1: //reminder
                             b.putInt("actionFlag", actionFlag);
@@ -432,7 +429,7 @@ public class CreateActivity extends AppCompatActivity {
                             b.putString("Mes", mMessageText.getText().toString());
                             Toast.makeText(CreateActivity.this, "SMS" + actionFlag, Toast.LENGTH_LONG).show();
                             break;
-                        case 3:
+                        case 3: //call
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
                             Toast.makeText(CreateActivity.this, "Call" + actionFlag, Toast.LENGTH_LONG).show();
@@ -446,9 +443,7 @@ public class CreateActivity extends AppCompatActivity {
                     sendBroadcast(gpsAlarm);
                 }else if(triggerFlag == 3 && distance > 100){
                     gpsFlag = false;
-                    Toast.makeText(CreateActivity.this, "B" + actionFlag, Toast.LENGTH_LONG).show();
                     Bundle b = new Bundle();
-                    Toast.makeText(CreateActivity.this, "A" + actionFlag, Toast.LENGTH_LONG).show();
                     switch (actionFlag) {
                         case 1: //reminder
                             b.putInt("actionFlag", actionFlag);
@@ -474,7 +469,7 @@ public class CreateActivity extends AppCompatActivity {
                     gpsAlarm.putExtras(b);
                     sendBroadcast(gpsAlarm);
                 }
-                Toast.makeText(CreateActivity.this, distance + "", Toast.LENGTH_LONG).show();
+                //Toast.makeText(CreateActivity.this, distance + "", Toast.LENGTH_LONG).show();
             }
         }
 

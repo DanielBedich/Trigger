@@ -10,7 +10,7 @@
         android:layout_width = "match_parent"
         android:layout_height = "300dp"
         android:id="@+id/triggerlist"
-        android:layout_weight="0.55">
+        android:layout_weight="0.61">
     </ListView>
 
     <LinearLayout

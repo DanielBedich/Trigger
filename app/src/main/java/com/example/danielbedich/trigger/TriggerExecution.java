@@ -35,8 +35,6 @@ public class TriggerExecution extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         mNotificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-        //View rootView = ((Activity)context).findViewById(android.R.id.content);
-        Toast.makeText(context, "In BR", Toast.LENGTH_LONG).show();
 
         Bundle bundle = intent.getExtras();
         final int NOTIF_ID = bundle.getInt("id");
@@ -44,7 +42,6 @@ public class TriggerExecution extends BroadcastReceiver {
         int flag = intent.getIntExtra("actionFlag", 0);
         switch (flag) {
             case 1:
-                Toast.makeText(context, "BR case1", Toast.LENGTH_LONG).show();
                 //Creates a notification with the text entered into the message field
                 NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context);
                 notifBuilder.setSmallIcon(R.drawable.common_google_signin_btn_icon_dark);
@@ -57,35 +54,23 @@ public class TriggerExecution extends BroadcastReceiver {
                 PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 notifBuilder.setContentIntent(resultPendingIntent);
                 mNotificationManager.notify(1, notifBuilder.build());
-                Toast.makeText(context, "jjjj", Toast.LENGTH_LONG).show();
                 break;
             case 2:
-                Toast.makeText(context, "BR case2", Toast.LENGTH_LONG).show();
                 SmsManager sms = SmsManager.getDefault();
                 sms.sendTextMessage(intent.getStringExtra("Num"), null, intent.getStringExtra("Mes"), null, null);
                 Toast.makeText(context, "Alarm Triggered and SMS Sent", Toast.LENGTH_LONG).show();
                 break;
 
             case 3:
-                Toast.makeText(context, "BR case3", Toast.LENGTH_LONG).show();
                 Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + intent.getStringExtra("Num")));
                 callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 if (PackageManager.PERMISSION_GRANTED == context.checkCallingOrSelfPermission(Manifest.permission.CALL_PHONE)) {
                     context.startActivity(callIntent);
-                }
-                Toast toast = Toast.makeText(context, "Call trap and Redirect", Toast.LENGTH_LONG);
-                toast.show();
+                };
                 break;
             default:
-                Toast.makeText(context, "BRdefault", Toast.LENGTH_LONG).show();
                 break;
         }
-    }
-
-
-    protected void makeCall(View v, String contactNum) {
-        //Call the specified number
-
     }
 
     protected void sendSms(String contactNum, String message) {
