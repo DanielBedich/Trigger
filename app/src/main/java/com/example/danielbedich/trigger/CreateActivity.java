@@ -364,14 +364,14 @@ public class CreateActivity extends AppCompatActivity {
                             break;
 
                     }
-                    //intentGpsAlarm.putExtras(b);
+                    intentAlarm.putExtras(b);
                     IntentFilter filter = new IntentFilter();
                     registerReceiver(new TriggerExecution(), filter);
                     mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                     if (PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
                         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, (long) 15, (float) 20, mLocationListener);
                     }
-                    PendingIntent proximityIntent = PendingIntent.getBroadcast(CreateActivity.this, PROX_ID, new Intent(intentAction), PendingIntent.FLAG_CANCEL_CURRENT);
+                    PendingIntent proximityIntent = PendingIntent.getBroadcast(CreateActivity.this, PROX_ID, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
                     if(PackageManager.PERMISSION_GRANTED == v.getContext().checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
                         Geocoder geocoder = new Geocoder(getApplicationContext());
                         List<Address> addresses = null;
