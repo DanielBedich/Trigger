@@ -421,21 +421,17 @@ public class CreateActivity extends AppCompatActivity {
                         case 1: //reminder
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Mes", mMessageText.getText().toString());
-                            Toast.makeText(CreateActivity.this, "Reminder" + actionFlag, Toast.LENGTH_LONG).show();
                             break;
                         case 2: //sms
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
                             b.putString("Mes", mMessageText.getText().toString());
-                            Toast.makeText(CreateActivity.this, "SMS" + actionFlag, Toast.LENGTH_LONG).show();
                             break;
                         case 3: //call
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
-                            Toast.makeText(CreateActivity.this, "Call" + actionFlag, Toast.LENGTH_LONG).show();
                             break;
                         default:
-                            Toast.makeText(CreateActivity.this, "default", Toast.LENGTH_LONG).show();
                             break;
 
                     }
@@ -448,21 +444,17 @@ public class CreateActivity extends AppCompatActivity {
                         case 1: //reminder
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Mes", mMessageText.getText().toString());
-                            Toast.makeText(CreateActivity.this, "Reminder" + actionFlag, Toast.LENGTH_LONG).show();
                             break;
                         case 2: //sms
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
                             b.putString("Mes", mMessageText.getText().toString());
-                            Toast.makeText(CreateActivity.this, "SMS" + actionFlag, Toast.LENGTH_LONG).show();
                             break;
                         case 3:
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
-                            Toast.makeText(CreateActivity.this, "Call" + actionFlag, Toast.LENGTH_LONG).show();
                             break;
                         default:
-                            Toast.makeText(CreateActivity.this, "default", Toast.LENGTH_LONG).show();
                             break;
 
                     }
