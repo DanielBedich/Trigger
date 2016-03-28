@@ -1,7 +1,6 @@
 package com.example.danielbedich.trigger;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -18,10 +17,8 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.SmsManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -31,22 +28,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import android.app.TimePickerDialog;
 
 import java.io.IOException;
-import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -98,6 +89,7 @@ public class CreateActivity extends AppCompatActivity {
     private int position;
     private int NOTIF_ID = 0;
     private boolean gpsFlag = true;
+    private boolean delete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,10 +97,14 @@ public class CreateActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(CreateActivity.this);
         position = this.getIntent().getIntExtra("trigger2", -1);
+        delete = this.getIntent().getBooleanExtra("delete", false);
+        Log.d("Boolean", ""+delete);
         triggerArrayList = getSharedPreferencesLogList(CreateActivity.this);
-        for(Trigger object: triggerArrayList){
-            Log.d("tago",""+object.getActionName());
-        }
+        if(triggerArrayList.size()>0&&position==-1)
+            NOTIF_ID = triggerArrayList.get(triggerArrayList.size()-1).getID()+1;
+        else if(position>=0)
+            NOTIF_ID = triggerArrayList.get(position).getID();
+
         //Initialize fields of view
         mSpinnerTrigger = (Spinner) findViewById(R.id.trigger_spinner);
         mSpinnerAction = (Spinner) findViewById(R.id.action_spinner);
@@ -224,7 +220,7 @@ public class CreateActivity extends AppCompatActivity {
                             actionSpinner.getSelectedItem().toString(),
                             contactNumber.getText().toString(), message.getText().toString(),
                             actionName.getText().toString(), timePicker.getCurrentHour(),
-                            timePicker.getCurrentMinute(), mGPSLocationText.getText().toString());
+                            timePicker.getCurrentMinute(), mGPSLocationText.getText().toString(), NOTIF_ID);
                     triggerArrayList.add(currentTrigger);
                 } else {
                     triggerArrayList.get(position).setTriggerType(triggerSpinner.getSelectedItem().toString());
@@ -238,7 +234,7 @@ public class CreateActivity extends AppCompatActivity {
                     triggers.set(position, actionName.getText().toString());
                     saveSharedStringPreferencesLogList(CreateActivity.this, triggers);
                 }
-
+                Log.d("Notif_ID", ""+NOTIF_ID);
                 //setup to get current location
                 mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                 if (PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && PackageManager.PERMISSION_GRANTED == checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -247,7 +243,6 @@ public class CreateActivity extends AppCompatActivity {
 
                 if (triggerFlag == 1) {
                     //Timer code
-                    NOTIF_ID++;
                     Calendar c = Calendar.getInstance();
                     int hourDiff = (mTimePicker.getCurrentHour() - c.get(Calendar.HOUR_OF_DAY)) * 60;
                     //Toast.makeText(CreateActivity.this, "hourDiff " + hourDiff, Toast.LENGTH_LONG).show();
@@ -269,18 +264,15 @@ public class CreateActivity extends AppCompatActivity {
                         case 1: //reminder
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Mes", mMessageText.getText().toString());
-                            b.putInt("id", NOTIF_ID);
                             break;
                         case 2: //sms
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
                             b.putString("Mes", mMessageText.getText().toString());
-                            b.putInt("id", NOTIF_ID);
                             break;
                         case 3:
                             b.putInt("actionFlag", actionFlag);
                             b.putString("Num", mContactText.getText().toString());
-                            b.putInt("id", NOTIF_ID);
                             break;
                         default:
                             break;
@@ -288,7 +280,9 @@ public class CreateActivity extends AppCompatActivity {
                     }
                     intentAlarm.putExtras(b);
                     AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
+                    if(position>=0) {
+                        alarmManager.cancel(PendingIntent.getBroadcast(CreateActivity.this, NOTIF_ID, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+                    }
                     alarmManager.set(AlarmManager.RTC_WAKEUP, time, PendingIntent.getBroadcast(CreateActivity.this, NOTIF_ID, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
                     Toast.makeText(CreateActivity.this, "Alarm Scheduled for " + timeStamp.toString(), Toast.LENGTH_LONG).show();
                 }
@@ -324,6 +318,7 @@ public class CreateActivity extends AppCompatActivity {
                 startActivityForResult(intent, CONTACT_PICKER);
             }
         });
+
 
     }
 

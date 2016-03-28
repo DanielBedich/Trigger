@@ -1,11 +1,14 @@
 package com.example.danielbedich.trigger;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -65,12 +68,9 @@ public class DetailsActivity extends AppCompatActivity {
         mButtonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent backAction = new Intent(v.getContext(), TriggerActivity.class);
-                triggerArrayList.remove(position);
-                triggers.remove(position);
-                saveSharedTriggerPreferencesLogList(DetailsActivity.this, triggerArrayList);
-                saveSharedStringPreferencesLogList(DetailsActivity.this, triggers);
-                startActivity(backAction);
+                Intent delAction = new Intent(v.getContext(), TriggerActivity.class);
+                delete(position);
+                startActivity(delAction);
             }
         });
 
@@ -85,6 +85,61 @@ public class DetailsActivity extends AppCompatActivity {
         });
 
     }
+
+    public void delete(int position){
+        Context context = DetailsActivity.this;
+        ArrayList<Trigger> triggerArrayList = getSharedTriggerPreferencesLogList(DetailsActivity.this);
+        ArrayList<String> triggers = getSharedStringPreferencesLogList(DetailsActivity.this);
+        int NOTIF_ID = triggerArrayList.get(position).getID();
+        int actionFlag=0;
+
+
+        if (triggerArrayList.get(position).getActionType().equals("Call")) {
+
+            actionFlag = 3;
+        }
+
+        if (triggerArrayList.get(position).getActionType().equals("Reminder")) {
+
+            actionFlag = 1;
+
+        }
+
+        if (triggerArrayList.get(position).getActionType().equals("SMS")) {
+            actionFlag = 2;
+        }
+
+        Intent intentAlarm = new Intent(context, TriggerExecution.class);
+        Bundle b = new Bundle();
+        switch (actionFlag) {
+            case 1: //reminder
+                b.putInt("actionFlag", actionFlag);
+                b.putString("Mes", triggerArrayList.get(position).getMessage());
+                break;
+            case 2: //sms
+                b.putInt("actionFlag", actionFlag);
+                b.putString("Num", triggerArrayList.get(position).getContactNumber());
+                b.putString("Mes", triggerArrayList.get(position).getMessage());
+                break;
+            case 3:
+                b.putInt("actionFlag", actionFlag);
+                b.putString("Num", triggerArrayList.get(position).getContactNumber());
+                break;
+            default:
+                break;
+
+        }
+        intentAlarm.putExtras(b);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(PendingIntent.getBroadcast(context, NOTIF_ID, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+        //used this to make sure my trigger class was extracting all the information in the class
+        triggerArrayList.remove(position);
+        triggers.remove(position);
+        saveSharedTriggerPreferencesLogList(context, triggerArrayList);
+        saveSharedStringPreferencesLogList(context, triggers);
+    }
+
+
 
     public static void saveSharedTriggerPreferencesLogList(Context context, ArrayList<Trigger> triggerArrayList) {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);

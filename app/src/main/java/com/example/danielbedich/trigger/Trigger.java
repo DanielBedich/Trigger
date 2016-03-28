@@ -13,8 +13,9 @@ public class Trigger {
     private int timeHour;
     private int timeMinute;
     private String gps;
+    private int ID;
 
-    public Trigger(String tType, String aType, String contact, String message, String name, int timeHour, int timeMinute, String gps){
+    public Trigger(String tType, String aType, String contact, String message, String name, int timeHour, int timeMinute, String gps, int ID){
         this.triggerType = tType;
         this.actionType = aType;
         this.contactNumber = contact;
@@ -23,6 +24,7 @@ public class Trigger {
         this.timeHour = timeHour;
         this.timeMinute = timeMinute;
         this.gps = gps;
+        this.ID = ID;
     }
 
     public String getTriggerType() {
@@ -84,6 +86,14 @@ public class Trigger {
 
     public void setGPS(String gps) {
         this.gps = gps;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
     }
 
 }
