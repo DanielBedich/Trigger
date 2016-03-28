@@ -100,6 +100,7 @@ public class CreateActivity extends AppCompatActivity {
     private LatLng destination;
     private int position;
     private int NOTIF_ID = 0;
+    private int PROX_ID = 0;
     private boolean gpsFlag = true;
 
     @Override
@@ -332,9 +333,50 @@ public class CreateActivity extends AppCompatActivity {
                     Toast.makeText(CreateActivity.this, "Alarm Scheduled for " + timeStamp.toString(), Toast.LENGTH_LONG).show();
                 }
                 if (triggerFlag == 2) {
-                    arrivalFlag = true;
+                    PROX_ID++;
+                    Intent intentAlarm = new Intent(CreateActivity.this, TriggerExecution.class);
+                    Bundle b = new Bundle();
+                    switch (actionFlag) {
+                        case 1: //reminder
+                            b.putInt("actionFlag", actionFlag);
+                            b.putString("Mes", mMessageText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
+                            break;
+                        case 2: //sms
+                            b.putInt("actionFlag", actionFlag);
+                            b.putString("Num", mContactText.getText().toString());
+                            b.putString("Mes", mMessageText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
+                            break;
+                        case 3:
+                            b.putInt("actionFlag", actionFlag);
+                            b.putString("Num", mContactText.getText().toString());
+                            b.putInt("id", NOTIF_ID);
+                            break;
+                        default:
+                            break;
+
+                    }
+                    intentAlarm.putExtras(b);
+                    PendingIntent proximityIntent = PendingIntent.getBroadcast(CreateActivity.this, PROX_ID, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
+                    if(PackageManager.PERMISSION_GRANTED == v.getContext().checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
+                        Geocoder geocoder = new Geocoder(getApplicationContext());
+                        List<Address> addresses = null;
+                        double latitude, longitude;
+                        try {
+                            addresses = geocoder.getFromLocationName(mGPSLocationText.getText().toString(), 1);
+                        } catch (IOException e) {
+
+                        }
+                        if (addresses.size() > 0) {
+                            latitude = addresses.get(0).getLatitude();
+                            longitude = addresses.get(0).getLongitude();
+                            destination = new LatLng(latitude, longitude);
+                        }
+                        mLocationManager.addProximityAlert(destination.latitude, destination.longitude, 50, -1, proximityIntent);
+                    }
                 }else if(triggerFlag == 3){
-                    departureFlag = true;
+
                 }
 
                 //used this to make sure my trigger class was extracting all the information in the class
@@ -443,6 +485,7 @@ public class CreateActivity extends AppCompatActivity {
             } catch (IOException e) {
 
             }
+            /*
             if (addresses.size() > 0) {
                 latitude = addresses.get(0).getLatitude();
                 longitude = addresses.get(0).getLongitude();
@@ -503,9 +546,12 @@ public class CreateActivity extends AppCompatActivity {
                     }
                     gpsAlarm.putExtras(b);
                     sendBroadcast(gpsAlarm);
+
                 }
+
                 //Toast.makeText(CreateActivity.this, distance + "", Toast.LENGTH_LONG).show();
             }
+            */
         }
 
         @Override
