@@ -90,6 +90,14 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/action_name"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/map_view"
+        android:text="View on Map"
+        android:layout_below="@+id/gps_location"
+        android:layout_centerHorizontal="true"/>
+
     <TimePicker
         android:layout_width="match_parent"
         android:layout_height="135dp"
