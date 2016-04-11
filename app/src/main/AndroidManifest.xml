@@ -42,8 +42,7 @@
         <activity
             android:name=".TriggerActivity"
             android:label="@string/title_activity_trigger"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -51,16 +50,13 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".CreateActivity"
-                  android:screenOrientation="portrait">
+        <activity android:name=".CreateActivity">
 
         </activity>
-        <activity android:name=".SavedActivity"
-                  android:screenOrientation="portrait">
+        <activity android:name=".SavedActivity">
 
         </activity>
-        <activity android:name=".DetailsActivity"
-                  android:screenOrientation="portrait">
+        <activity android:name=".DetailsActivity">
 
         </activity>
 
@@ -81,8 +77,7 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"
-            android:screenOrientation="portrait">
+            android:label="@string/title_activity_maps">
          </activity>
     </application>
 
