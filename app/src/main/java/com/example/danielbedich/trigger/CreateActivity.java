@@ -256,6 +256,7 @@ public class CreateActivity extends AppCompatActivity {
                             actionName.getText().toString(), timePicker.getCurrentHour(),
                             timePicker.getCurrentMinute(), mGPSLocationText.getText().toString(), NOTIF_ID);
                     triggerArrayList.add(currentTrigger);
+                    triggers.add(currentTrigger.getActionName());
                 } else {
                     triggerArrayList.get(position).setTriggerType(triggerSpinner.getSelectedItem().toString());
                     triggerArrayList.get(position).setActionType(actionSpinner.getSelectedItem().toString());

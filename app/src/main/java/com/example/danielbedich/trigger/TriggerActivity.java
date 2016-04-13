@@ -40,10 +40,6 @@ public class TriggerActivity extends AppCompatActivity implements AdapterView.On
 
         triggers = getSharedPreferencesLogList(TriggerActivity.this);
 
-        if(this.getIntent().getStringExtra("actionName") !=null) {
-            triggers.add(this.getIntent().getStringExtra("actionName"));
-        }
-
         saveSharedPreferencesLogList(TriggerActivity.this, triggers);
         if(!triggers.isEmpty()) {
             ListView listView = (ListView) findViewById(R.id.triggerlist);
