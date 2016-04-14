@@ -2,9 +2,11 @@ package com.example.danielbedich.trigger;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -17,6 +19,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -141,15 +144,21 @@ public class CreateActivity extends AppCompatActivity {
                     triggerFlag = 2;
                     mTimePicker.setEnabled(false);
                     mTimePicker.setVisibility(View.GONE);
-                    mButtonMapView.setVisibility(View.VISIBLE);
-                    mGPSLocationText.setVisibility(View.VISIBLE);
+                    if(!checkLocationAvailability(mLocationManager, CreateActivity.this)) {
+                        mButtonMapView.setVisibility(View.VISIBLE);
+                        mGPSLocationText.setVisibility(View.VISIBLE);
+                    }
+
 
                 }else{
                     triggerFlag = 3;
                     mTimePicker.setEnabled(false);
                     mTimePicker.setVisibility(View.GONE);
-                    mButtonMapView.setVisibility(View.VISIBLE);
-                    mGPSLocationText.setVisibility(View.VISIBLE);
+                    while(!checkLocationAvailability(mLocationManager, CreateActivity.this)) {
+                        mButtonMapView.setVisibility(View.VISIBLE);
+                        mGPSLocationText.setVisibility(View.VISIBLE);
+                    }
+
                 }
 
             }
@@ -626,5 +635,33 @@ public class CreateActivity extends AppCompatActivity {
             triggers = gson.fromJson(json, type);
         }
         return triggers;
+    }
+
+    public static boolean checkLocationAvailability(LocationManager manager, final Context context){
+        boolean gps_enabled =false;
+        try{
+            gps_enabled = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex){}
+
+        if(!gps_enabled) {
+            // notify user
+            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            dialog.setMessage(context.getResources().getString(R.string.gps_network_not_enabled));
+            dialog.setPositiveButton(context.getResources().getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    context.startActivity(myIntent);
+                }
+            });
+            dialog.setNegativeButton(context.getString(R.string.cancel_button), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+
+                }
+            });
+            dialog.show();
+        }
+        return gps_enabled;
     }
 }
