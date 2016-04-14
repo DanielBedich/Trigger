@@ -29,6 +29,7 @@ import java.util.ArrayList;
 public class TriggerActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
 
     private Button mButtonNew;
+    private Button mChangePassBtn;
     private ArrayList<String> triggers = new ArrayList<>();
 
     @Override
@@ -61,6 +62,14 @@ Log.d("TAGF", ""+triggers);
                 startActivity(newAction);
             }
 
+        });
+
+        mChangePassBtn = (Button) findViewById(R.id.changeBtn);
+        mChangePassBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(TriggerActivity.this, ChangePasswordActivity.class));
+            }
         });
     }
 
