@@ -144,7 +144,7 @@ public class CreateActivity extends AppCompatActivity {
                     triggerFlag = 2;
                     mTimePicker.setEnabled(false);
                     mTimePicker.setVisibility(View.GONE);
-                    if(!checkLocationAvailability(mLocationManager, CreateActivity.this)) {
+                    if(checkLocationAvailability(mLocationManager, CreateActivity.this)) {
                         mButtonMapView.setVisibility(View.VISIBLE);
                         mGPSLocationText.setVisibility(View.VISIBLE);
                     }
@@ -154,7 +154,7 @@ public class CreateActivity extends AppCompatActivity {
                     triggerFlag = 3;
                     mTimePicker.setEnabled(false);
                     mTimePicker.setVisibility(View.GONE);
-                    while(!checkLocationAvailability(mLocationManager, CreateActivity.this)) {
+                    if(checkLocationAvailability(mLocationManager, CreateActivity.this)) {
                         mButtonMapView.setVisibility(View.VISIBLE);
                         mGPSLocationText.setVisibility(View.VISIBLE);
                     }
