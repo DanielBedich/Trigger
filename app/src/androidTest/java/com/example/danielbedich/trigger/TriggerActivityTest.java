@@ -7,9 +7,14 @@ import android.test.UiThreadTest;
 import android.test.ViewAsserts;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 /**
  * Created by DanielBedich on 4/14/16.
@@ -92,29 +97,6 @@ public class TriggerActivityTest extends ActivityInstrumentationTestCase2<Trigge
         // next activity is opened and captured.
         assertNotNull(changePasswordActivity);
         changePasswordActivity.finish();
-    }
-
-    public void testListItemStartsDetailsActivity(){
-        // register next activity that need to be monitored.
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(DetailsActivity.class.getName(), null, false);
-
-        // open current activity.
-        TriggerActivity myActivity = getActivity();
-        final View view = (View) myActivity.findViewById(R.id.triggerlist);
-        myActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // click button and open next activity.
-
-            }
-        });
-
-        //Watch for the timeout
-        //example values 5000 if in ms, or 5 if it's in seconds.
-        DetailsActivity detailsActivity = (DetailsActivity)getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 5000);
-        // next activity is opened and captured.
-        assertNotNull(detailsActivity);
-        detailsActivity.finish();
     }
 
     protected void tearDown() throws Exception{

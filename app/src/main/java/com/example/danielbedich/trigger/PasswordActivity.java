@@ -42,7 +42,8 @@ public class PasswordActivity extends AppCompatActivity {
         mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mPassText.getText().toString().equals(password)) {
+                String text = mPassText.getText().toString();
+                if (checkPassword(text,password)) {
                     Toast.makeText(PasswordActivity.this, "Password correct", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(PasswordActivity.this, TriggerActivity.class));
                 } else {
@@ -51,5 +52,16 @@ public class PasswordActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public boolean checkPassword(String text, String password){
+        boolean b;
+        if(text.equals(password)){
+            b=true;
+        }
+        else{
+            b=false;
+        }
+        return b;
     }
 }
