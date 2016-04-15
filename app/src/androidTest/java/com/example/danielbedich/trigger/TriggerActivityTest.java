@@ -14,7 +14,7 @@ import android.widget.TextView;
 /**
  * Created by DanielBedich on 4/14/16.
  */
-public class TriggerActivityTest extends ActivityInstrumentationTestCase2<TriggerActivity> {
+public class TriggerActivityTest extends ActivityInstrumentationTestCase2<TriggerActivity>  {
     private TriggerActivity mTriggerActivity;
     private View mList;
     private View mNewBtn;
@@ -47,52 +47,74 @@ public class TriggerActivityTest extends ActivityInstrumentationTestCase2<Trigge
 
     }
 
-    public void testNewButtonLoadsCreateActivity() {
-        // Set up Activity Monitor
-        Instrumentation.ActivityMonitor createActivityMonitor =
-                mInstrumentation.addMonitor(CreateActivity.class.getName(),
-                        null, false);
+    public void testNewButtonStartsCreateActivity() {
+        // register next activity that need to be monitored.
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(CreateActivity.class.getName(), null, false);
 
-        // Click New Button
-        TouchUtils.clickView(this, mNewBtn);
+        // open current activity.
+        TriggerActivity myActivity = getActivity();
+        final Button newBtn = (Button) myActivity.findViewById(R.id.new_button);
+        myActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // click button and open next activity.
+                newBtn.performClick();
+            }
+        });
 
-        // Wait for the Activity to Load
-        CreateActivity receiverActivity = (CreateActivity)
-                createActivityMonitor.waitForActivityWithTimeout(TIMEOUT_IN_MS);
-
-        // Check the Activity has exists
-        assertNotNull("CreateActivity is null", receiverActivity);
-
-        // Check the Activity has loaded
-        assertEquals("Monitor for SearchActivity has not been called",
-                1, createActivityMonitor.getHits());
-
-        // Remove the Activity Monitor
-        getInstrumentation().removeMonitor(createActivityMonitor);
+        //Watch for the timeout
+        //example values 5000 if in ms, or 5 if it's in seconds.
+        CreateActivity createActivity = (CreateActivity)getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 5000);
+        // next activity is opened and captured.
+        assertNotNull(createActivity);
+        createActivity.finish();
     }
 
+
     public void testChangePasswordButtonLoadsChangePasswordActivity() {
-        // Set up Activity Monitor
-        Instrumentation.ActivityMonitor changePasswordActivityMonitor =
-                mInstrumentation.addMonitor(ChangePasswordActivity.class.getName(),
-                        null, false);
+        // register next activity that need to be monitored.
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(ChangePasswordActivity.class.getName(), null, false);
 
-        // Click ActionBar Your Holiday Icon
-        TouchUtils.clickView(this, mChangePWBtn);
+        // open current activity.
+        TriggerActivity myActivity = getActivity();
+        final Button chgBtn = (Button) myActivity.findViewById(R.id.changeBtn);
+        myActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // click button and open next activity.
+                chgBtn.performClick();
+            }
+        });
 
-        // Wait for the Activity to Load
-        ChangePasswordActivity receiverActivity = (ChangePasswordActivity)
-                changePasswordActivityMonitor.waitForActivityWithTimeout(TIMEOUT_IN_MS);
+        //Watch for the timeout
+        //example values 5000 if in ms, or 5 if it's in seconds.
+        ChangePasswordActivity changePasswordActivity = (ChangePasswordActivity)getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 5000);
+        // next activity is opened and captured.
+        assertNotNull(changePasswordActivity);
+        changePasswordActivity.finish();
+    }
 
-        // Check the Activity has exists
-        assertNotNull("ChangePasswordActivity is null", receiverActivity);
+    public void testListItemStartsDetailsActivity(){
+        // register next activity that need to be monitored.
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(DetailsActivity.class.getName(), null, false);
 
-        // Check the Activity has loaded
-        assertEquals("Monitor for YourHolidayActivity has not been called",
-                1, changePasswordActivityMonitor.getHits());
+        // open current activity.
+        TriggerActivity myActivity = getActivity();
+        final View view = (View) myActivity.findViewById(R.id.triggerlist);
+        myActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // click button and open next activity.
 
-        // Remove the Activity Monitor
-        getInstrumentation().removeMonitor(changePasswordActivityMonitor);
+            }
+        });
+
+        //Watch for the timeout
+        //example values 5000 if in ms, or 5 if it's in seconds.
+        DetailsActivity detailsActivity = (DetailsActivity)getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 5000);
+        // next activity is opened and captured.
+        assertNotNull(detailsActivity);
+        detailsActivity.finish();
     }
 
     protected void tearDown() throws Exception{
