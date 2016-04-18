@@ -1,17 +1,21 @@
 package com.example.danielbedich.trigger;
 
 import android.app.Instrumentation;
+import android.test.ActivityInstrumentationTestCase2;
+import android.test.TouchUtils;
+import android.test.UiThreadTest;
+import android.test.ViewAsserts;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.telecom.Call;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.View;
 import android.widget.Button;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 /**
@@ -39,7 +43,7 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
     protected void setUp() throws Exception{
         super.setUp();
 
-        setActivityInitialTouchMode(false);
+        setActivityInitialTouchMode(true);
         mDetailsActivity = getActivity();
         mName = mDetailsActivity.findViewById(R.id.name);
         mTrigger = mDetailsActivity.findViewById(R.id.trigger);
@@ -50,6 +54,7 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
         mDeletePWBtn = mDetailsActivity.findViewById(R.id.delete_button);
         mBackPWBtn = mDetailsActivity.findViewById(R.id.back_button);
         mInstrumentation = getInstrumentation();
+
     }
 
     public void testPreconditions(){
@@ -66,6 +71,7 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
     }
 
     public void testBackButtonStartsTriggerActivity() {
+
         // register next activity that need to be monitored.
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(TriggerActivity.class.getName(), null, false);
 
@@ -120,12 +126,8 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
         // open current activity.
         DetailsActivity myActivity = getActivity();
         ArrayList<Trigger> triggerArrayList = DetailsActivity.getSharedTriggerPreferencesLogList(myActivity);
-        Trigger trigger = new Trigger("Time","SMS","5672247591","message","name",1,2,"",999999);
         int size = triggerArrayList.size();
-        triggerArrayList.add(0,trigger);
-        DetailsActivity.saveSharedTriggerPreferencesLogList(myActivity, triggerArrayList);
         final Button deleteBtn = (Button) myActivity.findViewById(R.id.edit_button);
-
         myActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

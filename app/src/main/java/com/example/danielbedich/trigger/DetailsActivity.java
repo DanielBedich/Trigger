@@ -45,6 +45,13 @@ public class DetailsActivity extends AppCompatActivity {
         position = (int) this.getIntent().getIntExtra("trigger", 0);
         triggerArrayList = getSharedTriggerPreferencesLogList(DetailsActivity.this);
         Log.d("tag2",""+position);
+
+        if(triggerArrayList.isEmpty()){
+            Trigger trigger = new Trigger("Time","SMS","5672247591","message","name",1,2,"",999999);
+            triggerArrayList.add(trigger);
+            saveSharedTriggerPreferencesLogList(DetailsActivity.this, triggerArrayList);
+        }
+
         nameDetails.setText("Name: " + triggerArrayList.get(position).getActionName());
         triggerDetails.setText("Trigger: " + triggerArrayList.get(position).getTriggerType());
         actionDetails.setText("Action: " + triggerArrayList.get(position).getActionType());
