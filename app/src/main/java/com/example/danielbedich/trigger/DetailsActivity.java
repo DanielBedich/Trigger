@@ -46,21 +46,16 @@ public class DetailsActivity extends AppCompatActivity {
         triggerArrayList = getSharedTriggerPreferencesLogList(DetailsActivity.this);
         Log.d("tag2",""+position);
 
-        if(triggerArrayList.isEmpty()){
-            Trigger trigger = new Trigger("Time","SMS","5672247591","message","name",1,2,"",999999);
-            triggerArrayList.add(trigger);
-            saveSharedTriggerPreferencesLogList(DetailsActivity.this, triggerArrayList);
+        if(!triggerArrayList.isEmpty()) {
+            nameDetails.setText("Name: " + triggerArrayList.get(position).getActionName());
+            triggerDetails.setText("Trigger: " + triggerArrayList.get(position).getTriggerType());
+            actionDetails.setText("Action: " + triggerArrayList.get(position).getActionType());
+            contactDetails.setText("Contact: " + triggerArrayList.get(position).getContactNumber());
+            messageDetails.setText("Message: " + triggerArrayList.get(position).getMessage());
         }
 
-        nameDetails.setText("Name: " + triggerArrayList.get(position).getActionName());
-        triggerDetails.setText("Trigger: " + triggerArrayList.get(position).getTriggerType());
-        actionDetails.setText("Action: " + triggerArrayList.get(position).getActionType());
-        contactDetails.setText("Contact: " + triggerArrayList.get(position).getContactNumber());
-        messageDetails.setText("Message: " + triggerArrayList.get(position).getMessage());
-        
 
-
-        mButtonBack = (Button) findViewById(R.id.back_button);
+        mButtonBack = (Button) findViewById(R.id.backbutton);
         mButtonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,7 +64,7 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
-        mButtonDelete = (Button) findViewById(R.id.delete_button);
+        mButtonDelete = (Button) findViewById(R.id.deletebutton);
         mButtonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,7 +74,7 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
-        mButtonEdit = (Button) findViewById(R.id.edit_button);
+        mButtonEdit = (Button) findViewById(R.id.editbutton);
         mButtonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -7,15 +7,12 @@ import android.test.UiThreadTest;
 import android.test.ViewAsserts;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.telecom.Call;
-import android.test.ActivityInstrumentationTestCase2;
-import android.widget.Button;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 
 /**
@@ -43,16 +40,16 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
     protected void setUp() throws Exception{
         super.setUp();
 
-        setActivityInitialTouchMode(true);
+        setActivityInitialTouchMode(false);
         mDetailsActivity = getActivity();
         mName = mDetailsActivity.findViewById(R.id.name);
         mTrigger = mDetailsActivity.findViewById(R.id.trigger);
         mAction = mDetailsActivity.findViewById(R.id.action);
         mContact = mDetailsActivity.findViewById(R.id.contact);
         mMessage = mDetailsActivity.findViewById(R.id.message);
-        mEditBtn = mDetailsActivity.findViewById(R.id.edit_button);
-        mDeletePWBtn = mDetailsActivity.findViewById(R.id.delete_button);
-        mBackPWBtn = mDetailsActivity.findViewById(R.id.back_button);
+        mEditBtn = mDetailsActivity.findViewById(R.id.editbutton);
+        mDeletePWBtn = mDetailsActivity.findViewById(R.id.deletebutton);
+        mBackPWBtn = mDetailsActivity.findViewById(R.id.backbutton);
         mInstrumentation = getInstrumentation();
 
     }
@@ -77,7 +74,7 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
 
         // open current activity.
         DetailsActivity myActivity = getActivity();
-        final Button backBtn = (Button) myActivity.findViewById(R.id.back_button);
+        final Button backBtn = (Button) myActivity.findViewById(R.id.backbutton);
         myActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -94,14 +91,19 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
         triggerActivity.finish();
     }
 
-
     public void testEditButtonStartsCreateActivity() {
+
+            ArrayList<Trigger> triggerArrayList = DetailsActivity.getSharedTriggerPreferencesLogList(mDetailsActivity);
+        if(triggerArrayList.isEmpty()) {
+            triggerArrayList.add(new Trigger("Time", "SMS", "5672247591", "message", "name", 1, 2, "", 999999));
+            DetailsActivity.saveSharedTriggerPreferencesLogList(mDetailsActivity, triggerArrayList);
+        }
         // register next activity that need to be monitored.
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(CreateActivity.class.getName(), null, false);
 
         // open current activity.
         DetailsActivity myActivity = getActivity();
-        final Button editBtn = (Button) myActivity.findViewById(R.id.edit_button);
+        final Button editBtn = (Button) myActivity.findViewById(R.id.editbutton);
         myActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -116,18 +118,23 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
         // next activity is opened and captured.
         assertNotNull(createActivity);
         createActivity.finish();
+        if(triggerArrayList.get(0).getID()==999999)
+            triggerArrayList.remove(0);
     }
 
     public void testDeleteStartsTriggerActivity() {
+
+        ArrayList<Trigger> triggerArrayList = DetailsActivity.getSharedTriggerPreferencesLogList(mDetailsActivity);
+        triggerArrayList.add(new Trigger("Time", "SMS", "5672247591", "message","name",1,2,"",999999));
+            DetailsActivity.saveSharedTriggerPreferencesLogList(mDetailsActivity, triggerArrayList);
+            int size = triggerArrayList.size()-1;
 
         // register next activity that need to be monitored.
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(TriggerActivity.class.getName(), null, false);
 
         // open current activity.
         DetailsActivity myActivity = getActivity();
-        ArrayList<Trigger> triggerArrayList = DetailsActivity.getSharedTriggerPreferencesLogList(myActivity);
-        int size = triggerArrayList.size();
-        final Button deleteBtn = (Button) myActivity.findViewById(R.id.edit_button);
+        final Button deleteBtn = (Button) myActivity.findViewById(R.id.deletebutton);
         myActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -140,10 +147,11 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
         //example values 5000 if in ms, or 5 if it's in seconds.
         TriggerActivity triggerActivity = (TriggerActivity)getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 5000);
         // next activity is opened and captured.
-        triggerArrayList = DetailsActivity.getSharedTriggerPreferencesLogList(myActivity);
-        assertEquals(size, triggerArrayList.size());
         assertNotNull(triggerActivity);
         triggerActivity.finish();
+
+        triggerArrayList = DetailsActivity.getSharedTriggerPreferencesLogList(mDetailsActivity);
+        assertEquals(size, triggerArrayList.size());
     }
 
     protected void tearDown() throws Exception{
