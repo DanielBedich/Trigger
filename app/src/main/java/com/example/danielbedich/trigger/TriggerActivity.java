@@ -1,14 +1,10 @@
 package com.example.danielbedich.trigger;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -30,7 +25,8 @@ public class TriggerActivity extends AppCompatActivity implements AdapterView.On
 
     private Button mButtonNew;
     private Button mChangePassBtn;
-    private ArrayList<String> triggers = new ArrayList<>();
+    private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
+    private ArrayList<String> triggerList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,17 +35,21 @@ public class TriggerActivity extends AppCompatActivity implements AdapterView.On
         //how to dynamically add items to the list
         //need to learn how to save activity details for when the app closes and then use those activity names to refill list
 
-        triggers = getSharedPreferencesLogList(TriggerActivity.this);
+        triggerArrayList = getSharedPreferencesLogList(TriggerActivity.this);
 
-        saveSharedPreferencesLogList(TriggerActivity.this, triggers);
-        if(!triggers.isEmpty()) {
+        if(!triggerArrayList.isEmpty()) {
+
+            for(Trigger triggerObject : triggerArrayList){
+                triggerList.add(triggerObject.getActionName());
+            }
+
             ListView listView = (ListView) findViewById(R.id.triggerlist);
-            ListAdapter listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, triggers);
+            ListAdapter listAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, triggerList);
             listView.setAdapter(listAdapter);
             listView.setOnItemClickListener(this);
         }
 
-        Log.d("TAGF", ""+triggers);
+        Log.d("TAGF", ""+ triggerList);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -73,27 +73,18 @@ public class TriggerActivity extends AppCompatActivity implements AdapterView.On
         });
     }
 
-    public static void saveSharedPreferencesLogList(Context context, ArrayList<String> triggers){
+    public static ArrayList<Trigger> getSharedPreferencesLogList(Context context) {
+        ArrayList<Trigger> triggerArrayList = new ArrayList<>();
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor  mEditor = mPrefs.edit();
+        SharedPreferences.Editor mEditor = mPrefs.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(triggers);
-        mEditor.putString("Triggers", json);
-        mEditor.commit();
-    }
-
-    public static ArrayList<String> getSharedPreferencesLogList(Context context) {
-        ArrayList<String> triggers = new ArrayList<>();
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor  mEditor = mPrefs.edit();
-        Gson gson = new Gson();
-        String json = mPrefs.getString("Triggers", "");
-        Type type = new TypeToken<ArrayList<String>>(){}.getType();
-        //catch null lists
-        if(gson.fromJson(json, type)!=null) {
-            triggers = gson.fromJson(json, type);
+        String json = mPrefs.getString("TriggerList", "");
+        Type type = new TypeToken<ArrayList<Trigger>>() {
+        }.getType();
+        if (gson.fromJson(json, type) != null) {
+            triggerArrayList = gson.fromJson(json, type);
         }
-        return triggers;
+        return triggerArrayList;
     }
 
     @Override

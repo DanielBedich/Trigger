@@ -76,7 +76,6 @@ public class CreateActivity extends AppCompatActivity {
     private Trigger currentTrigger;
     private EditText mGPSLocationText;
     private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
-    private ArrayList<String> triggers = new ArrayList<>();
     private String[] triggerArray;
     private String[] actionArray;
     private EditText mNameText;
@@ -265,9 +264,7 @@ public class CreateActivity extends AppCompatActivity {
                             actionName.getText().toString(), timePicker.getCurrentHour(),
                             timePicker.getCurrentMinute(), mGPSLocationText.getText().toString(), NOTIF_ID);
                     triggerArrayList.add(currentTrigger);
-                    triggers = getSharedStringPreferencesLogList(CreateActivity.this);
-                    triggers.add(currentTrigger.getActionName());
-                    saveSharedStringPreferencesLogList(CreateActivity.this, triggers);
+
                 } else {
                     triggerArrayList.get(position).setTriggerType(triggerSpinner.getSelectedItem().toString());
                     triggerArrayList.get(position).setActionType(actionSpinner.getSelectedItem().toString());
@@ -276,9 +273,6 @@ public class CreateActivity extends AppCompatActivity {
                     triggerArrayList.get(position).setActionName(actionName.getText().toString());
                     triggerArrayList.get(position).setTime(timePicker.getCurrentHour(), timePicker.getCurrentMinute());
                     triggerArrayList.get(position).setGPS(mGPSLocationText.getText().toString());
-                    triggers = getSharedStringPreferencesLogList(CreateActivity.this);
-                    triggers.set(position, actionName.getText().toString());
-                    saveSharedStringPreferencesLogList(CreateActivity.this, triggers);
                 }
                 Log.d("Notif_ID", ""+NOTIF_ID);
 
@@ -612,29 +606,6 @@ public class CreateActivity extends AppCompatActivity {
             triggerArrayList = gson.fromJson(json, type);
         }
         return triggerArrayList;
-    }
-
-    public static void saveSharedStringPreferencesLogList(Context context, ArrayList<String> triggers){
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor  mEditor = mPrefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(triggers);
-        mEditor.putString("Triggers", json);
-        mEditor.commit();
-    }
-
-    public static ArrayList<String> getSharedStringPreferencesLogList(Context context) {
-        ArrayList<String> triggers = new ArrayList<>();
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor  mEditor = mPrefs.edit();
-        Gson gson = new Gson();
-        String json = mPrefs.getString("Triggers", "");
-        Type type = new TypeToken<ArrayList<String>>(){}.getType();
-        //catch null lists
-        if(gson.fromJson(json, type)!=null) {
-            triggers = gson.fromJson(json, type);
-        }
-        return triggers;
     }
 
     public static boolean checkLocationAvailability(LocationManager manager, final Context context){

@@ -14,24 +14,24 @@ import java.util.ArrayList;
  */
 public class StringArrayAdapter extends BaseAdapter{
 
-    ArrayList<String> triggers;
+    ArrayList<String> triggerList;
     Context ctxt;
     LayoutInflater inflater;
 
 
-    public StringArrayAdapter(ArrayList<String> triggerList, Context context){
-        this.triggers = triggerList;
+    public StringArrayAdapter(ArrayList<String> triggerArrayList, Context context){
+        this.triggerList = triggerArrayList;
         this.ctxt = context;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount(){
-        return triggers.size();
+        return triggerList.size();
     }
     @Override
     public Object getItem(int position){
-        return triggers.get(position);
+        return triggerList.get(position);
     }
     @Override
     public long getItemId(int arg0){
@@ -44,7 +44,7 @@ public class StringArrayAdapter extends BaseAdapter{
         if(view==null){
             view = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
             TextView name = (TextView)view.findViewById(android.R.id.text1);
-            name.setText(triggers.get(position));
+            name.setText(triggerList.get(position));
         }
 
         return view;

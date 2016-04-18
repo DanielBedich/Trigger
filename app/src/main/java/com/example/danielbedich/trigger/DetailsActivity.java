@@ -32,7 +32,6 @@ public class DetailsActivity extends AppCompatActivity {
     private TextView messageDetails;
     private int position;
     private ArrayList<Trigger> triggerArrayList = new ArrayList<>();
-    private ArrayList<String> triggers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +44,6 @@ public class DetailsActivity extends AppCompatActivity {
         messageDetails =(TextView)findViewById(R.id.message);
         position = (int) this.getIntent().getIntExtra("trigger", 0);
         triggerArrayList = getSharedTriggerPreferencesLogList(DetailsActivity.this);
-        triggers = getSharedStringPreferencesLogList(DetailsActivity.this);
         Log.d("tag2",""+position);
         nameDetails.setText("Name: " + triggerArrayList.get(position).getActionName());
         triggerDetails.setText("Trigger: " + triggerArrayList.get(position).getTriggerType());
@@ -89,7 +87,6 @@ public class DetailsActivity extends AppCompatActivity {
     public void delete(int position){
         Context context = DetailsActivity.this;
         ArrayList<Trigger> triggerArrayList = getSharedTriggerPreferencesLogList(DetailsActivity.this);
-        ArrayList<String> triggers = getSharedStringPreferencesLogList(DetailsActivity.this);
         int NOTIF_ID = triggerArrayList.get(position).getID();
         int actionFlag=0;
 
@@ -137,9 +134,7 @@ public class DetailsActivity extends AppCompatActivity {
         alarmManager.cancel(PendingIntent.getBroadcast(context, NOTIF_ID, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
         //used this to make sure my trigger class was extracting all the information in the class
         triggerArrayList.remove(position);
-        triggers.remove(position);
         saveSharedTriggerPreferencesLogList(context, triggerArrayList);
-        saveSharedStringPreferencesLogList(context, triggers);
     }
 
 
@@ -167,27 +162,5 @@ public class DetailsActivity extends AppCompatActivity {
         return triggerArrayList;
     }
 
-    public static void saveSharedStringPreferencesLogList(Context context, ArrayList<String> triggers){
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor  mEditor = mPrefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(triggers);
-        mEditor.putString("Triggers", json);
-        mEditor.commit();
-    }
-
-    public static ArrayList<String> getSharedStringPreferencesLogList(Context context) {
-        ArrayList<String> triggers = new ArrayList<>();
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor  mEditor = mPrefs.edit();
-        Gson gson = new Gson();
-        String json = mPrefs.getString("Triggers", "");
-        Type type = new TypeToken<ArrayList<String>>(){}.getType();
-        //catch null lists
-        if(gson.fromJson(json, type)!=null) {
-            triggers = gson.fromJson(json, type);
-        }
-        return triggers;
-    }
 
 }
