@@ -13,6 +13,13 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.danielbedich.trigger.CreateActivity;
+import com.example.danielbedich.trigger.DetailsActivity;
+import com.example.danielbedich.trigger.R;
+import com.example.danielbedich.trigger.Trigger;
+import com.example.danielbedich.trigger.TriggerActivity;
+
 import java.util.ArrayList;
 
 /**
@@ -118,8 +125,10 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
         // next activity is opened and captured.
         assertNotNull(createActivity);
         createActivity.finish();
-        if(triggerArrayList.get(0).getID()==999999)
+        if(triggerArrayList.get(0).getActionName().equals("name")) {
             triggerArrayList.remove(0);
+            DetailsActivity.saveSharedTriggerPreferencesLogList(mDetailsActivity, triggerArrayList);
+        }
     }
 
     public void testDeleteStartsTriggerActivity() {
