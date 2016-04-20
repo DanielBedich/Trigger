@@ -125,7 +125,7 @@ public class DetailsActivityTest extends ActivityInstrumentationTestCase2<Detail
     public void testDeleteStartsTriggerActivity() {
 
         ArrayList<Trigger> triggerArrayList = DetailsActivity.getSharedTriggerPreferencesLogList(mDetailsActivity);
-        triggerArrayList.add(new Trigger("Time", "SMS", "5672247591", "message","name",1,2,"",999999));
+        triggerArrayList.add(0, new Trigger("Time", "SMS", "5672247591", "message","name",1,2,"",999999));
             DetailsActivity.saveSharedTriggerPreferencesLogList(mDetailsActivity, triggerArrayList);
             int size = triggerArrayList.size()-1;
 
